@@ -1,4 +1,5 @@
 #include <cmath>
+#include "solid.h"
 #include "sphere.h"
 #include "vector.h"
 

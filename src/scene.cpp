@@ -1,7 +1,7 @@
+#include <iostream>
 #include "scene.h"
 
-
-void Scene::AddSphere(Sphere s)
+void Scene::AddSphere(Solid *s)
 {
     objects.emplace_back(s);
 }
@@ -13,9 +13,9 @@ HitRecord Scene::ClosestIntersection(Ray r, double tMin)
     int idMin = -1;
 
     // iterate through and check for a hit
-    for (long unsigned i = 0; i < objects.size(); i++)
+    for (long unsigned i = 0; i < objects.size(); ++i)
     {
-        double t = objects[i].Intersect(r, tMin);
+        double t = objects[i]->Intersect(r, tMin);
 
         // if hit then set the "record" values accordingly
         if (t < recordT)
@@ -25,6 +25,6 @@ HitRecord Scene::ClosestIntersection(Ray r, double tMin)
         }
     }
 
-    // return a hitrecord with the details 
+    // return a hitrecord with the details
     return HitRecord(recordT, idMin);
 }

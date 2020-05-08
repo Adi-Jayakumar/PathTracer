@@ -59,8 +59,8 @@ Ray Camera::GenerateRay(int i, int j, int sx, int sy)
     return Ray(rayOr, (rayOr - focus).Norm());
 }
 
-void Camera::AddToScene(Sphere s)
-{
+void Camera::AddToScene(Solid *s)
+{   
     scene.AddSphere(s);
 }
 
@@ -79,15 +79,15 @@ Vec Camera::PixelColour(Ray r, int depth)
     }
 
     // the object that was hit
-    Sphere &hit = scene.objects[rec.id];
+    Solid *hit = scene.objects[rec.id];
     // the hit-point
     Vec hitPt = r.o + r.d * rec.t;
     // the surface normal
-    Vec normal = hit.Normal(hitPt);
+    Vec normal = hit->Normal(hitPt);
     // the normal that faces toward the ray
     Vec rayNormal = Vec::Dot(normal, r.d) < 0 ? normal : normal * -1;
 
-    Vec albedo = hit.c;
+    Vec albedo = hit->c;
 
     // probability of terminating early
     double finProb = PTMath::Luma(albedo);
@@ -96,10 +96,10 @@ Vec Camera::PixelColour(Ray r, int depth)
         if (PTMath::Random() < finProb)
             albedo = albedo / finProb;
         else
-            return hit.e;
+            return hit->e;
     }
 
-    if (hit.s == DIFF)
+    if (hit->s == DIFF)
     {
         double phi = 2 * PTMath::PI * PTMath::Random();
         double r2 = PTMath::Random();
@@ -113,24 +113,62 @@ Vec Camera::PixelColour(Ray r, int depth)
         Vec v = Vec::Cross(u, w).Norm();
 
         Vec newDir = (u * cos(phi) * sinTheta + v * sin(phi) * sinTheta + w * cosTheta).Norm();
-        return hit.e + albedo * PixelColour(Ray(hitPt, newDir), depth);
+        return hit->e + albedo * PixelColour(Ray(hitPt, newDir), depth);
     }
-    else if (hit.s == SPEC)
+    else if (hit->s == SPEC)
     {
         // std::cout <<rayNormal << std::endl;
         Vec reflectedDir = r.d - rayNormal * 2 * Vec::Dot(rayNormal, r.d);
-        return hit.e + albedo * PixelColour(Ray(hitPt, reflectedDir), depth);
+        return hit->e + albedo * PixelColour(Ray(hitPt, reflectedDir), depth);
     }
-    // else if (hit.s == REFR)
-    // {
-    //     Ray reflectedRay = Ray(hitPt, r.d - normal * 2 * Vec::Dot(normal, r.d));
-    //     bool isInto = Vec::Dot(normal, rayNormal) > 0;
-    //     double n1 = 1;
-    //     double n2 = 1.5;
-    //     double netN = isInto ? n1/n2 : n2/n1;
-    //     double cosTheta = Vec::Dot(r.d, rayNormal);
-    //     double cosTheta2Sqr = 1 - netN * netN * (1 - cosTheta * cosTheta);
-    //     if(cosTheta2Sqr < 0)
-    // }
+    else if (hit->s == REFR)
+    {
+        Ray reflectedRay = Ray(hitPt, r.d - rayNormal * 2 * Vec::Dot(rayNormal, r.d));
+
+        // is the ray going into the object or out?
+        bool isInto = Vec::Dot(normal, rayNormal) > 0;
+
+        // refractive indices
+        double n1 = 1;
+        double n2 = 1.5;
+        double netN = isInto ? n1 / n2 : n2 / n1;
+
+        // cosines of the angles
+        double cosTheta = Vec::Dot(r.d, rayNormal);
+        double cosTheta2Sqr = 1 - netN * netN * (1 - cosTheta * cosTheta);
+
+        // total internal reflection
+        if (cosTheta2Sqr < 0)
+            return hit->e + albedo * PixelColour(reflectedRay, depth);
+
+        Vec rerfactedDir = (r.d * netN - normal * ((isInto ? 1 : -1) * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
+        // Vec rerfactedDir = (r.d * netN - rayNormal * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
+
+        // approximating reflection and refraction weights
+        double a = n2 - n1;
+        double b = n1 + n2;
+        double R0 = (a * a) / (b * b);
+
+        double cosTheta2 = Vec::Dot(rerfactedDir, normal);
+        double c = 1 - (isInto ? -cosTheta : cosTheta2);
+        double refl = R0 + (1 - R0) * c * c * c * c;
+        double refr = 1 - refl;
+
+        double P = 0.25 + 0.5 * refl;
+
+        double reflectionWeight = refl / P;
+        double refractionWeight = refr / P;
+
+        if (depth < 3)
+            return hit->e + albedo * (PixelColour(reflectedRay, depth) * refl + PixelColour(Ray(hitPt, rerfactedDir), depth) * refr);
+        else
+        {
+            if (PTMath::Random() < P)
+                return hit->e + albedo * PixelColour(reflectedRay, depth) * reflectionWeight;
+            else
+                return hit->e + albedo * PixelColour(Ray(hitPt, rerfactedDir), depth) * refractionWeight;
+            
+        }
+    }
     return Vec();
 }

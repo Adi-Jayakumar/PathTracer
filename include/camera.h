@@ -2,6 +2,7 @@
 #include <vector>
 #include "vector.h"
 #include "ray.h"
+#include "solid.h"
 #include "sphere.h"
 #include "scene.h"
 
@@ -13,6 +14,6 @@ struct Camera
     Scene scene;
     Camera(double _worldW, int _nPixelsX, int _nPixelsY, Vec _loc, Vec _forward, Vec _up, double _hFOV);
     Ray GenerateRay(int i, int j, int sx, int sy);
-    void AddToScene(Sphere s);
+    void AddToScene(Solid *s);
     Vec PixelColour(Ray r, int depth);
 };
