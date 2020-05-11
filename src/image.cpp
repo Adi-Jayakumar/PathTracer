@@ -1,8 +1,9 @@
 #include <cmath>
 #include <iostream>
+#include <sstream>
 #include "image.h"
 
-Image::Image(int _dimX, int _dimY)
+Image::Image(int _dimX, int _dimY, int index)
 {
     dimX = _dimX;
     dimY = _dimY;
@@ -22,9 +23,9 @@ void Image::Set(Vec colour[])
     {
         Vec c = colour[i];
         unsigned char col[3];
-        double r = pow(c.x, 1.0 / 2.2) * 255;
-        double g = pow(c.y, 1.0 / 2.2) * 255;
-        double b = pow(c.z, 1.0 / 2.2) * 255;
+        double r = pow(c.x, 1.0 / 2) * 255;
+        double g = pow(c.y, 1.0 / 2) * 255;
+        double b = pow(c.z, 1.0 / 2) * 255;
         col[0] = r > 255 ? 255 : r < 0 ? 0 : r;
         col[1] = g > 255 ? 255 : g < 0 ? 0 : g;
         col[2] = b > 255 ? 255 : b < 0 ? 0 : b;

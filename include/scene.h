@@ -3,10 +3,15 @@
 #include "solid.h"
 #include "sphere.h"
 #include "hitrecord.h"
+#include "camera.h"
 
 struct Scene
 {
     std::vector<Solid*> objects;
-    void AddSphere(Solid* s);
-    HitRecord ClosestIntersection(Ray r, double tMin);
+    std::vector<Camera> cameras;
+    void AddSolid(Solid* s);
+    void AddCamera(Camera c);
+    HitRecord ClosestIntersection(Ray r);
+    Vec PixelColour(Ray r, int depth);
+    void TakePicture(int index);
 };

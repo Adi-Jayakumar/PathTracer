@@ -1,6 +1,5 @@
-#include "plane.h"
-#include "ptmath.h"
 #include <limits>
+#include "plane.h"
 
 Plane::Plane(Vec _n, Vec _p, Vec _e, Vec _c, Surface _s)
 {
@@ -27,4 +26,9 @@ double Plane::Intersect(Ray &ray, double tMin)
 Vec Plane::Normal(Vec &x)
 {
     return n;
+}
+
+void Plane::Translate(Vec &x)
+{   
+    p = p + x;
 }

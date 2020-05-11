@@ -13,9 +13,3 @@ double PTMath::Random()
     static thread_local std::uniform_real_distribution<double> dist(0, 1.0);
     return dist(prng);
 }
-
-double PTMath::Tent()
-{   
-    double r = PTMath::Random();
-    return fabs(r) > 1 ? 0 : 1 - fabs(r);
-}

@@ -1,11 +1,10 @@
 #include <cmath>
-#include "solid.h"
+#include <limits>
 #include "sphere.h"
-#include "vector.h"
 
 Sphere::Sphere(double _r, Vec _p, Vec _e, Vec _c, Surface _s)
 {
-    
+
     r = _r;
     p = _p;
     e = _e;
@@ -13,7 +12,7 @@ Sphere::Sphere(double _r, Vec _p, Vec _e, Vec _c, Surface _s)
     s = _s;
 }
 
-double Sphere::Intersect(Ray &ray, double tMin)
+double Sphere::Intersect(Ray &ray)
 {
     double A = Vec::Dot(ray.d, ray.d);
     double B = 2 * Vec::Dot(ray.o, ray.d) - 2 * Vec::Dot(p, ray.d);
@@ -37,14 +36,14 @@ double Sphere::Intersect(Ray &ray, double tMin)
         return std::numeric_limits<double>::max();
     else if (t1 >= 0)
     {
-        if(t1 > tMin)
+        if (t1 > PTMath::EPSILON)
             return t1;
         else
             return std::numeric_limits<double>::max();
     }
     else if (t1 < 0)
     {
-        if (t2 > tMin)
+        if (t2 > PTMath::EPSILON)
             return t2;
         else
             return std::numeric_limits<double>::max();
@@ -54,6 +53,11 @@ double Sphere::Intersect(Ray &ray, double tMin)
 };
 
 Vec Sphere::Normal(Vec &v)
+{
+    return (v - p) / r;
+}
+
+void Sphere::Translate(Vec &x)
 {   
-    return (v - p)/r;
+    p = p + x;
 }
