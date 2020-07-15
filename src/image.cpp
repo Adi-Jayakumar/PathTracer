@@ -1,13 +1,15 @@
 #include <cmath>
-#include <iostream>
-#include <sstream>
 #include "image.h"
 
 Image::Image(int _dimX, int _dimY, int index)
 {
     dimX = _dimX;
     dimY = _dimY;
-    file = fopen("result.ppm", "wb");
+    const char* str = "result";
+    const char* ext = ".ppm";
+    char fileName[sizeof(str) + sizeof(ext) + 1];
+    snprintf(fileName, sizeof(fileName), "result %d", index, ext);
+    file = fopen(fileName, "wb");
     fprintf(file, "P6\n%d %d\n255\n", dimX, dimY);
 }
 

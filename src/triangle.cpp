@@ -11,7 +11,7 @@ Triangle::Triangle(Vec _p1, Vec _p2, Vec _p3, Vec _e, Vec _c, Surface _s)
     e = _e;
     c = _c;
     s = _s;
-    n = Vec::Cross(p2 - p1, p3 - p1);
+    n = Vec::Cross(p2 - p1, p3 - p1).Norm();
 }
 
 double Triangle::Intersect(Ray &r)
@@ -31,10 +31,8 @@ double Triangle::Intersect(Ray &r)
     if (v < 0 || u + v > 1)
         return std::numeric_limits<double>::max();
     double t = Vec::Dot(edge2, q) / a;
-    if (t > PTMath::EPSILON)
-    {   
+    if (t > PTUtility::EPSILON)
         return t;
-    }
     return std::numeric_limits<double>::max();
 }
 

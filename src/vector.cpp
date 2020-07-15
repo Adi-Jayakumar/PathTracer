@@ -18,7 +18,7 @@ Vec::Vec(double _x, double _y, double _z)
 std::ostream &operator<<(std::ostream &out, Vec const &v)
 {
     // out << "(" << v.x << ", " << v.y << ", " << v.z << ")";// << std::endl;
-    out << v.x << ", " << v.y << ", " << v.z << "   "; // << std::endl;
+    out << "(" << v.x << ", " << v.y << ", " << v.z << ")"; // << std::endl;
     return out;
 }
 
@@ -52,6 +52,10 @@ Vec Vec::Cross(Vec u, Vec v)
 double Vec::Mod()
 {
     return sqrt(x * x + y * y + z * z);
+}
+double Vec::ModSq()
+{
+    return x * x + y * y + z * z;
 }
 Vec Vec::Norm()
 {

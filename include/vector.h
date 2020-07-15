@@ -13,6 +13,7 @@ struct Vec
     Vec operator/(double k);
     static Vec Cross(Vec u, Vec v); // cross product of 2 vectors
     double Mod(); // returns the modulus of the vector
+    double ModSq(); // returns the modulus of the vector squared
     static double Dot(Vec u, Vec v); // dot product of 2 vectors
     Vec Norm(); // returns a normalised vector
 };

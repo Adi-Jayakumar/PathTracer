@@ -3,5 +3,13 @@
 		{
 			"path": "."
 		}
-	]
+	],
+	"settings": {
+		"files.associations": {
+			"string": "cpp",
+			"fstream": "cpp",
+			"*.tcc": "cpp",
+			"ostream": "cpp"
+		}
+	}
 }

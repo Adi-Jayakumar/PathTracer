@@ -49,14 +49,13 @@ Ray Camera::GenerateRay(int i, int j, int sx, int sy)
     we can see that with respect to c, o becomes (j - 0.5, 0.5 - i) in a world where the top of 
     the screen is up and the right is right
     */
-    double r1 = 2 * PTMath::Random();
+    double r1 = 2 * PTUtility::Random();
     double dx = r1 < 1 ? sqrt(r1) - 1 : 1 - sqrt(2 - r1);
-    double r2 = 2 * PTMath::Random();
+    double r2 = 2 * PTUtility::Random();
     double dy = r1 < 1 ? sqrt(r2) - 1 : 1 - sqrt(2 - r2);
     Vec deltaRight = right * worldW * (((double)j + (sx + 0.5 + dx) / 2) / nPixelsX - 0.5);
     Vec deltaUp = up * worldH * (0.5 - ((double)i + (sy + 0.5 + dy) / 2) / nPixelsY);
     Vec rayOr = deltaUp + deltaRight + loc;
     return Ray(rayOr, (rayOr - focus).Norm());
 }
-
 
