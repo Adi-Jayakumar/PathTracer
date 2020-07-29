@@ -4,8 +4,8 @@
 namespace PTUtility
 {
     // image parameters
-    const int W = 200;
-    const int H = 200;
+    const int W = 100;
+    const int H = 100;
     const int NumSamps = 400;
     const int SubPixSize = 2;
 

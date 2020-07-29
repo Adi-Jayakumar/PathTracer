@@ -93,12 +93,12 @@ Vec Scene::RayColour(Ray r, int depth)
     }
     else if (hit->s == Surface::SPEC)
     {
-        Vec reflectedDir = r.d - rayNormal * 2 * Vec::Dot(rayNormal, r.d);
+        Vec reflectedDir = r.d - normal * 2 * Vec::Dot(normal, r.d);
         return hit->e + albedo * RayColour(Ray(hitPt, reflectedDir), depth);
     }
     else if (hit->s == Surface::REFR)
     {
-        Ray reflectedRay = Ray(hitPt, r.d - rayNormal * 2 * Vec::Dot(rayNormal, r.d));
+        Ray reflectedRay = Ray(hitPt, r.d - normal * 2 * Vec::Dot(normal, r.d));
 
         // is the ray going into the object or out?
         bool isInto = Vec::Dot(normal, rayNormal) > 0;
@@ -132,7 +132,7 @@ Vec Scene::RayColour(Ray r, int depth)
         double P = 0.25 + 0.5 * refl;
 
         double reflectionWeight = refl / P;
-        double refractionWeight = refr / P;
+        double refractionWeight = refr / (1 - P);
 
         if (depth < 3)
             return hit->e + albedo * (RayColour(reflectedRay, depth) * refl + RayColour(Ray(hitPt, rerfactedDir), depth) * refr);
@@ -222,7 +222,7 @@ void Scene::LoadOBJModel(std::string fPath)
         {
             int v1, v2, v3;
             s >> junk >> v1 >> v2 >> v3;
-            std::shared_ptr<Triangle> temp = std::make_shared<Triangle>(vertices[v1 - 1], vertices[v2 - 1], vertices[v3 - 1], Vec(), Vec(1, 1, 1), Surface::REFR);
+            std::shared_ptr<Triangle> temp = std::make_shared<Triangle>(vertices[v1 - 1], vertices[v2 - 1], vertices[v3 - 1], Vec(), Vec(1, 1, 1), Surface::SPEC);
             AddSolid(temp);
         }
     }
