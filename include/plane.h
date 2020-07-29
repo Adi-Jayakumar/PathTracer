@@ -1,11 +1,12 @@
 #pragma once
 #include "solid.h"
 
-class Plane : public Solid
+class Plane : public Shape
 {
     public:
         Vec n; // normal
-        Plane(Vec _n, Vec _p, Vec _e, Vec _c, Surface _s);
+        Vec p;
+        Plane(Vec _n, Vec _p);
         Plane(const Plane &plane);
         double Intersect(Ray &ray);
         Vec Normal(Vec &x);

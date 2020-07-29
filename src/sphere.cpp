@@ -2,31 +2,28 @@
 #include <limits>
 #include "sphere.h"
 
-Sphere::Sphere(double _r, Vec _p, Vec _e, Vec _c, Surface _s)
+Sphere::Sphere(double _r, Vec _c)
 {
 
     r = _r;
-    p = _p;
-    e = _e;
     c = _c;
-    s = _s;
 }
 
 double Sphere::Intersect(Ray &ray)
 {
     double A = Vec::Dot(ray.d, ray.d);
-    double B = 2 * Vec::Dot(ray.o, ray.d) - 2 * Vec::Dot(p, ray.d);
-    double C = Vec::Dot(ray.o, ray.o) + Vec::Dot(p, p) - 2 * Vec::Dot(ray.o, p) - r * r;
+    double B = 2 * Vec::Dot(ray.o, ray.d) - 2 * Vec::Dot(c, ray.d);
+    double C = Vec::Dot(ray.o, ray.o) + Vec::Dot(c, c) - 2 * Vec::Dot(ray.o, c) - r * r;
 
     return PTUtility::SolveQuadratic(A, B, C);
 };
 
 Vec Sphere::Normal(Vec &v)
 {
-    return (v - p) / r;
+    return (v - c) / r;
 }
 
 void Sphere::Translate(Vec &x)
 {
-    p = p + x;
+    c = c + x;
 }

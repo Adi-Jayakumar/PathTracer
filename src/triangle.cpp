@@ -2,15 +2,11 @@
 #include <limits>
 #include "triangle.h"
 
-Triangle::Triangle(Vec _p1, Vec _p2, Vec _p3, Vec _e, Vec _c, Surface _s)
+Triangle::Triangle(Vec _p1, Vec _p2, Vec _p3)
 {
     p1 = _p1;
     p2 = _p2;
     p3 = _p3;
-    p = (p1 + p2 + p3) / 3;
-    e = _e;
-    c = _c;
-    s = _s;
     n = Vec::Cross(p2 - p1, p3 - p1).Norm();
 }
 
@@ -46,5 +42,4 @@ void Triangle::Translate(Vec &x)
     p1 = p1 + x;
     p2 = p2 + x;
     p3 = p3 + x;
-    p = p + x;
 }

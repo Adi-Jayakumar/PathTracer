@@ -5,11 +5,12 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <memory>
 #include <sstream>
 
 using namespace std;
 
-void Scene::AddSolid(std::shared_ptr<Solid> s)
+void Scene::AddSolid(Solid s)
 {
     objects.push_back(s);
 }
@@ -28,7 +29,7 @@ HitRecord Scene::ClosestIntersection(Ray r)
     // iterate through and check for a hit
     for (long unsigned i = 0; i < objects.size(); i++)
     {
-        double t = objects[i]->Intersect(r);
+        double t = objects[i].shape->Intersect(r);
 
         // if hit then set the "record" values accordingly
         if (t < recordT)
@@ -55,15 +56,15 @@ Vec Scene::RayColour(Ray r, int depth)
         return Vec();
 
     // the object that was hit
-    std::shared_ptr<Solid> hit = objects[rec.id];
+    Solid hit = objects[rec.id];
     // the hit-point
     Vec hitPt = r.o + r.d * rec.t;
     // the surface normal
-    Vec normal = hit->Normal(hitPt);
+    Vec normal = hit.shape->Normal(hitPt);
     // the normal that faces toward the ray
     Vec rayNormal = Vec::Dot(normal, r.d) < 0 ? normal : normal * -1;
 
-    Vec albedo = hit->c;
+    Vec albedo = hit.c;
 
     // probability of terminating early
     double finProb = PTUtility::Luma(albedo);
@@ -72,10 +73,10 @@ Vec Scene::RayColour(Ray r, int depth)
         if (PTUtility::Random() < finProb)
             albedo = albedo / finProb;
         else
-            return hit->e;
+            return hit.e;
     }
 
-    if (hit->s == Surface::DIFF)
+    if (hit.s == Surface::DIFF)
     {
         double phi = 2 * PTUtility::PI * PTUtility::Random();
         double r2 = PTUtility::Random();
@@ -89,14 +90,14 @@ Vec Scene::RayColour(Ray r, int depth)
         Vec v = Vec::Cross(u, w).Norm();
 
         Vec newDir = (u * cos(phi) * sinTheta + v * sin(phi) * sinTheta + w * cosTheta).Norm();
-        return hit->e + albedo * RayColour(Ray(hitPt, newDir), depth);
+        return hit.e + albedo * RayColour(Ray(hitPt, newDir), depth);
     }
-    else if (hit->s == Surface::SPEC)
+    else if (hit.s == Surface::SPEC)
     {
         Vec reflectedDir = r.d - normal * 2 * Vec::Dot(normal, r.d);
-        return hit->e + albedo * RayColour(Ray(hitPt, reflectedDir), depth);
+        return hit.e + albedo * RayColour(Ray(hitPt, reflectedDir), depth);
     }
-    else if (hit->s == Surface::REFR)
+    else if (hit.s == Surface::REFR)
     {
         Ray reflectedRay = Ray(hitPt, r.d - normal * 2 * Vec::Dot(normal, r.d));
 
@@ -114,7 +115,7 @@ Vec Scene::RayColour(Ray r, int depth)
 
         // total internal reflection
         if (cosTheta2Sqr < 0)
-            return hit->e + albedo * RayColour(reflectedRay, depth);
+            return hit.e + albedo * RayColour(reflectedRay, depth);
 
         Vec rerfactedDir = (r.d * netN - normal * ((isInto ? 1 : -1) * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
         // Vec rerfactedDir = (r.d * netN - rayNormal * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
@@ -135,13 +136,13 @@ Vec Scene::RayColour(Ray r, int depth)
         double refractionWeight = refr / (1 - P);
 
         if (depth < 3)
-            return hit->e + albedo * (RayColour(reflectedRay, depth) * refl + RayColour(Ray(hitPt, rerfactedDir), depth) * refr);
+            return hit.e + albedo * (RayColour(reflectedRay, depth) * refl + RayColour(Ray(hitPt, rerfactedDir), depth) * refr);
         else
         {
             if (PTUtility::Random() < P)
-                return hit->e + albedo * RayColour(reflectedRay, depth) * reflectionWeight;
+                return hit.e + albedo * RayColour(reflectedRay, depth) * reflectionWeight;
             else
-                return hit->e + albedo * RayColour(Ray(hitPt, rerfactedDir), depth) * refractionWeight;
+                return hit.e + albedo * RayColour(Ray(hitPt, rerfactedDir), depth) * refractionWeight;
         }
     }
     return Vec();
@@ -184,18 +185,18 @@ void Scene::TakePicture(int index)
 
 void Scene::LoadCornell(double boxSize)
 {
-    std::shared_ptr<Plane> front = std::make_shared<Plane>(Vec(0, 0, -1), Vec(0, 0, boxSize), Vec(), Vec(1, 1, 1), Surface::DIFF);
-    std::shared_ptr<Plane> right = std::make_shared<Plane>(Vec(-1, 0, 0), Vec(boxSize, 0, 0), Vec(), Vec(0, 1, 0), Surface::DIFF);
-    std::shared_ptr<Plane> back = std::make_shared<Plane>(Vec(0, 0, 1), Vec(0, 0, -boxSize), Vec(), Vec(), Surface::DIFF);
-    std::shared_ptr<Plane> left = std::make_shared<Plane>(Vec(1, 0, 0), Vec(-boxSize, 0, 0), Vec(), Vec(1, 0, 0), Surface::DIFF);
-    std::shared_ptr<Plane> top = std::make_shared<Plane>(Vec(0, -1, 0), Vec(0, boxSize, 0), Vec(1, 1, 1), Vec(), Surface::DIFF);
-    std::shared_ptr<Plane> bottom = std::make_shared<Plane>(Vec(0, 1, 0), Vec(0., -boxSize, 0), Vec(), Vec(1, 1, 1), Surface::DIFF);
-    objects.emplace_back(front);
-    objects.emplace_back(right);
-    objects.emplace_back(back);
-    objects.emplace_back(left);
-    objects.emplace_back(top);
-    objects.emplace_back(bottom);
+    std::shared_ptr front = std::make_shared<Plane>(Vec(0, 0, -1), Vec(0, 0, boxSize));
+    std::shared_ptr right = std::make_shared<Plane>(Vec(-1, 0, 0), Vec(boxSize, 0, 0));
+    std::shared_ptr back = std::make_shared<Plane>(Vec(0, 0, 1), Vec(0, 0, -boxSize));
+    std::shared_ptr left = std::make_shared<Plane>(Vec(1, 0, 0), Vec(-boxSize, 0, 0));
+    std::shared_ptr top = std::make_shared<Plane>(Vec(0, -1, 0), Vec(0, boxSize, 0));
+    std::shared_ptr bottom = std::make_shared<Plane>(Vec(0, 1, 0), Vec(0., -boxSize, 0));
+    objects.emplace_back(Solid(front, Vec(), Vec(1, 1, 1), Surface::DIFF));
+    objects.emplace_back(Solid(right, Vec(), Vec(0, 1, 0), Surface::DIFF));
+    objects.emplace_back(Solid(back, Vec(), Vec(), Surface::DIFF));
+    objects.emplace_back(Solid(left, Vec(), Vec(1, 0, 0), Surface::DIFF));
+    objects.emplace_back(Solid(top, Vec(1, 1, 1), Vec(), Surface::DIFF));
+    objects.emplace_back(Solid(bottom, Vec(), Vec(1, 1, 1), Surface::DIFF));
 }
 
 void Scene::LoadOBJModel(std::string fPath)
@@ -222,8 +223,8 @@ void Scene::LoadOBJModel(std::string fPath)
         {
             int v1, v2, v3;
             s >> junk >> v1 >> v2 >> v3;
-            std::shared_ptr<Triangle> temp = std::make_shared<Triangle>(vertices[v1 - 1], vertices[v2 - 1], vertices[v3 - 1], Vec(), Vec(1, 1, 1), Surface::SPEC);
-            AddSolid(temp);
+            std::shared_ptr<Shape> temp = std::make_shared<Triangle>(vertices[v1 - 1], vertices[v2 - 1], vertices[v3 - 1]);
+            AddSolid(Solid(temp, Vec(), Vec(0, 0, 1), Surface::DIFF));
         }
     }
     file.close();

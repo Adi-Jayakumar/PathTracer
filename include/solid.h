@@ -1,5 +1,7 @@
 #pragma once
+#include <memory>
 #include "ray.h"
+#include "shape.h"
 #include "ptutility.h"
 
 enum class Surface
@@ -12,9 +14,8 @@ enum class Surface
 class Solid
 {
 public:
-    Vec p, e, c;
+    std::shared_ptr<Shape> shape;
+    Vec e, c;
     Surface s;
-    virtual double Intersect(Ray &ray) = 0;
-    virtual Vec Normal(Vec &x) = 0;
-    virtual void Translate(Vec &x) = 0;
+    Solid(std::shared_ptr<Shape> _shape, Vec _e, Vec _c, Surface _s);
 };

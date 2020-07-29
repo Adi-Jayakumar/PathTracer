@@ -21,7 +21,6 @@ int main()
     scene.AddCamera(CamUp);
     
     scene.LoadCornell(2);
-    scene.LoadOBJModel("dodecahedron.txt");
     scene.TakePicture(0);
 
     return 0;
