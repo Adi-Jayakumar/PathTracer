@@ -1,4 +1,6 @@
-#include "solid.h"
+#pragma once
+#include "shape.h"
+#include <memory>
 
 enum class SetOp
 {
@@ -7,13 +9,14 @@ enum class SetOp
     SUB,
 };
 
-class Composite : public Solid
+class Composite : public Shape
 {
 public:
-    Composite *lhs;
-    Composite *rhs;
+    std::shared_ptr<Shape> lhs;
+    std::shared_ptr<Shape> rhs;
     SetOp op;
-    virtual double Intersect(Ray &ray) = 0;
-    virtual Vec Normal(Vec &x) = 0;
-    virtual void Translate(Vec &x) = 0;
+    Composite(std::shared_ptr<Shape> _lhs, std::shared_ptr<Shape> _rhs, SetOp _op);
+    bool Intersect(Ray &ray, double &hit) override;
+    Vec Normal(Vec &x) override;
+    void Translate(Vec &x) override;
 };

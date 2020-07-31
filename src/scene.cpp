@@ -25,11 +25,13 @@ HitRecord Scene::ClosestIntersection(Ray r)
     // Assume no hit initally
     double recordT = std::numeric_limits<double>::max();
     int idMin = -1;
+    double t;
 
     // iterate through and check for a hit
     for (long unsigned i = 0; i < objects.size(); i++)
     {
-        double t = objects[i].shape->Intersect(r);
+        t = std::numeric_limits<double>::max();
+        objects[i].shape->Intersect(r, t);
 
         // if hit then set the "record" values accordingly
         if (t < recordT)
@@ -150,10 +152,16 @@ Vec Scene::RayColour(Ray r, int depth)
 
 void Scene::TakePicture(int index)
 {
-    Vec image[PTUtility::W * PTUtility::H];
+    Vec *image = new Vec[PTUtility::W * PTUtility::H];
     Image im = Image(PTUtility::W, PTUtility::H, index);
     Ray r;
+    int rowCount;
 
+    std::cout << std::endl
+              << std::endl
+              << "Started casting rays" << std::endl
+              << "Number of rays cast: " << PTUtility::W * PTUtility::H * PTUtility::NumSamps * PTUtility::SubPixSize * PTUtility::SubPixSize << std::endl
+              << std::endl;
 #pragma omp parallel for schedule(dynamic, 1) private(r)
     // image rows
     for (int i = 0; i < PTUtility::H; i++)
@@ -178,9 +186,12 @@ void Scene::TakePicture(int index)
             }
             image[i * PTUtility::W + j] = c / ((double)PTUtility::NumSamps * PTUtility::SubPixSize * PTUtility::SubPixSize);
         }
+        rowCount++;
+        if (rowCount % 50 == 0)
+            std::cout << "Progress: " << (static_cast<double>(rowCount) / PTUtility::H) * 100 << std::endl;
     }
-
     im.Set(image);
+    delete[] image;
 }
 
 void Scene::LoadCornell(double boxSize)

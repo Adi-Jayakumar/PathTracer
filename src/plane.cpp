@@ -1,5 +1,5 @@
-#include <limits>
 #include "plane.h"
+#include <limits>
 
 Plane::Plane(Vec _n, Vec _p)
 {
@@ -13,16 +13,19 @@ Plane::Plane(const Plane &plane)
     n = plane.n;
 }
 
-double Plane::Intersect(Ray &ray)
+bool Plane::Intersect(Ray &ray, double &hit)
 {
     double det = Vec::Dot(ray.d, n);
-    if (det == 0)
-        return std::numeric_limits<double>::max();
 
+    // plane and ray parallel
+    if (det == 0)
+        return false;
+    
     double t = Vec::Dot(n, p - ray.o) / det;
     if (t < PTUtility::EPSILON)
-        return std::numeric_limits<double>::max();
-    return t;
+        return false;
+    hit = t;
+    return true;
 }
 
 Vec Plane::Normal(Vec &x)

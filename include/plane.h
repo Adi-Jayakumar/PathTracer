@@ -1,14 +1,14 @@
 #pragma once
-#include "solid.h"
+#include "shape.h"
 
 class Plane : public Shape
 {
-    public:
-        Vec n; // normal
-        Vec p;
-        Plane(Vec _n, Vec _p);
-        Plane(const Plane &plane);
-        double Intersect(Ray &ray);
-        Vec Normal(Vec &x);
-        void Translate(Vec &x);
+public:
+    Vec n; // normal
+    Vec p;
+    Plane(Vec _n, Vec _p);
+    Plane(const Plane &plane);
+    bool Intersect(Ray &ray, double &hit) override;
+    Vec Normal(Vec &x) override;
+    void Translate(Vec &x) override;
 };

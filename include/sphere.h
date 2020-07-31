@@ -10,7 +10,7 @@ class Sphere : public Shape
         double r;
         Vec c;
         Sphere(double _r, Vec _c);
-        double Intersect(Ray &ray);
-        Vec Normal(Vec &v);
-        void Translate(Vec &x);
+        bool Intersect(Ray &ray, double & hit) override;
+        Vec Normal(Vec &v) override;
+        void Translate(Vec &x) override;
 };
