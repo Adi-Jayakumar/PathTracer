@@ -31,3 +31,8 @@ void Sphere::Translate(Vec &x)
 {
     c = c + x;
 }
+
+bool Sphere::IsOnSkin(Vec &x)
+{
+    return fabs((x - c).ModSq() - r*r) < PTUtility::EPSILON;
+}

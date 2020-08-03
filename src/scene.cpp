@@ -234,8 +234,8 @@ void Scene::LoadOBJModel(std::string fPath)
         {
             int v1, v2, v3;
             s >> junk >> v1 >> v2 >> v3;
-            std::shared_ptr<Shape> temp = std::make_shared<Triangle>(vertices[v1 - 1], vertices[v2 - 1], vertices[v3 - 1]);
-            AddSolid(Solid(temp, Vec(), Vec(0, 0, 1), Surface::DIFF));
+            std::shared_ptr<Shape> temp = std::make_shared<Triangle>(vertices[v1 - 1] - Vec(1.25, 1.25, 1.25), vertices[v2 - 1] - Vec(1.25, 1.25, 1.25), vertices[v3 - 1] - Vec(1.25, 1.25, 1.25));
+            AddSolid(Solid(temp, Vec(), Vec(1, 1, 1), Surface::REFR));
         }
     }
     file.close();

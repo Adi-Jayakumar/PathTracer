@@ -13,4 +13,5 @@ class Sphere : public Shape
         bool Intersect(Ray &ray, double & hit) override;
         Vec Normal(Vec &v) override;
         void Translate(Vec &x) override;
+        bool IsOnSkin(Vec &x) override;
 };

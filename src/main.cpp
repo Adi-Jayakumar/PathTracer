@@ -1,4 +1,5 @@
 #include "camera.h"
+#include "composite.h"
 #include "hitrecord.h"
 #include "image.h"
 #include "plane.h"
@@ -18,20 +19,14 @@ int main()
 {
 
     Scene scene;
-    Camera CamUp = Camera(20, PTUtility::W, PTUtility::H, Vec(0, 0, -19.99), Vec(0, 0, 1), Vec(0, 1, 0), PTUtility::PI / 3.0);
+    Camera CamUp = Camera(1, PTUtility::W, PTUtility::H, Vec(0, 0, -1.99), Vec(0, 0, 1), Vec(0, 1, 0), PTUtility::PI / 3.0);
     scene.AddCamera(CamUp);
 
-    scene.LoadCornell(20);
+    scene.LoadCornell(2);
 
-    std::shared_ptr<Sphere> left = std::make_shared<Sphere>(8., Vec(-10, -12, 10));
-    std::shared_ptr<Sphere> right = std::make_shared<Sphere>(8., Vec(10, -12, 0));
-
-    Solid mirr = Solid(left, Vec(), Vec(1, 1, 1), Surface::SPEC);
-    Solid glass = Solid(right, Vec(), Vec(1, 1, 1), Surface::REFR);
-
-    scene.AddSolid(mirr);
-    scene.AddSolid(glass);
-
+    std::shared_ptr<Sphere> right = std::make_shared<Sphere>(1, Vec(0.5, 0, 0));
+    std::shared_ptr<Sphere> left = std::make_shared<Sphere>(1, Vec(-0.5, 0, 0));
+    std::shared_ptr<Composite> comp = right - left;
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -39,7 +34,8 @@ int main()
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-    std::cout << std::endl << "Seconds: " << duration.count() << std::endl;
+    std::cout << std::endl
+              << "Seconds: " << duration.count() << std::endl;
 
     return 0;
 }

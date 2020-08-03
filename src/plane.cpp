@@ -1,4 +1,5 @@
 #include "plane.h"
+#include <cmath>
 #include <limits>
 
 Plane::Plane(Vec _n, Vec _p)
@@ -20,7 +21,7 @@ bool Plane::Intersect(Ray &ray, double &hit)
     // plane and ray parallel
     if (det == 0)
         return false;
-    
+
     double t = Vec::Dot(n, p - ray.o) / det;
     if (t < PTUtility::EPSILON)
         return false;
@@ -36,4 +37,9 @@ Vec Plane::Normal(Vec &x)
 void Plane::Translate(Vec &x)
 {
     p = p + x;
+}
+
+bool Plane::IsOnSkin(Vec &x)
+{
+    return fabs(Vec::Dot(n, x - p)) < PTUtility::EPSILON;
 }

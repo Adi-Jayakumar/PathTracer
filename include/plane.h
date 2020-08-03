@@ -11,4 +11,5 @@ public:
     bool Intersect(Ray &ray, double &hit) override;
     Vec Normal(Vec &x) override;
     void Translate(Vec &x) override;
+    bool IsOnSkin(Vec &x) override;
 };
