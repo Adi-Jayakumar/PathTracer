@@ -187,8 +187,8 @@ void Scene::TakePicture(int index)
             image[i * PTUtility::W + j] = c / ((double)PTUtility::NumSamps * PTUtility::SubPixSize * PTUtility::SubPixSize);
         }
         rowCount++;
-        if (rowCount % 50 == 0)
-            std::cout << "Progress: " << (static_cast<double>(rowCount) / PTUtility::H) * 100 << std::endl;
+        if (rowCount % (PTUtility::H/10) == 0)
+            std::cout << "Progress: " << (static_cast<double>(rowCount) / PTUtility::H) * 100 << "%" << std::endl;
     }
     im.Set(image);
     delete[] image;

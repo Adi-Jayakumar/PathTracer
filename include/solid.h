@@ -11,7 +11,7 @@ enum class Surface
     REFR
 };
 
-class Solid
+struct Solid
 {
 public:
     std::shared_ptr<Shape> shape;

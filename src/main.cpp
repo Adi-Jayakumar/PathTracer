@@ -24,15 +24,23 @@ int main()
 
     scene.LoadCornell(2);
 
-    std::shared_ptr<Sphere> right = std::make_shared<Sphere>(1, Vec(0.5, 0, 0));
-    std::shared_ptr<Sphere> left = std::make_shared<Sphere>(1, Vec(-0.5, 0, 0));
-    std::shared_ptr<Composite> comp = right - left;
+    std::shared_ptr<Sphere> left = std::make_shared<Sphere>(1, Vec(-1, 0, 0));
+    std::shared_ptr<Sphere> right = std::make_shared<Sphere>(1, Vec(1, 0, 0));
+    // std::shared_ptr<Sphere> bottom = std::make_shared<Sphere>(1, Vec(0, -0.5, 0));
+    std::shared_ptr<Shape> comp = (left - right);
 
+    Solid test = Solid(comp, Vec(), Vec(1,0,1), Surface::DIFF);
+    scene.AddSolid(test);
+
+    // clock start
     auto start = std::chrono::high_resolution_clock::now();
 
     scene.TakePicture(0);
 
+    // clock stop
     auto stop = std::chrono::high_resolution_clock::now();
+
+
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
     std::cout << std::endl
               << "Seconds: " << duration.count() << std::endl;

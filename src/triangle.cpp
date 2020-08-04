@@ -67,3 +67,25 @@ bool Triangle::IsOnSkin(Vec &x)
 
     return (d1 > 0 && d2 > 0 && d3 > 0) || (d1 < 0 && d2 < 0 && d3 < 0);
 }
+
+double Triangle::FarSolution(Ray &ray)
+{
+    Vec edge1 = p2 - p1;
+    Vec edge2 = p3 - p1;
+    Vec h = Vec::Cross(ray.d, edge2);
+    double a = Vec::Dot(edge1, h);
+    if (fabs(a) < 1e-7)
+        return std::numeric_limits<double>::max();
+    Vec s = ray.o - p1;
+    double u = Vec::Dot(s, h) / a;
+    if (u < 0 || u > 1)
+        return std::numeric_limits<double>::max();
+    Vec q = Vec::Cross(s, edge1);
+    double v = Vec::Dot(ray.d, q) / a;
+    if (v < 0 || u + v > 1)
+        return std::numeric_limits<double>::max();
+    double t = Vec::Dot(edge2, q) / a;
+    if (t > PTUtility::EPSILON)
+        return t;
+    return std::numeric_limits<double>::max();
+}

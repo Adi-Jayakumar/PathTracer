@@ -43,3 +43,17 @@ bool Plane::IsOnSkin(Vec &x)
 {
     return fabs(Vec::Dot(n, x - p)) < PTUtility::EPSILON;
 }
+
+double Plane::FarSolution(Ray &ray)
+{
+    double det = Vec::Dot(ray.d, n);
+
+    // plane and ray parallel
+    if (det == 0)
+        return std::numeric_limits<double>::max();
+
+    double t = Vec::Dot(n, p - ray.o) / det;
+    if (t < PTUtility::EPSILON)
+        return std::numeric_limits<double>::max();
+    return t;
+}

@@ -5,7 +5,7 @@
 #include "hitrecord.h"
 #include "camera.h"
 
-class Scene
+struct Scene
 {
     public:
         std::vector<Solid> objects;

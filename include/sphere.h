@@ -4,7 +4,7 @@
 #include "shape.h"
 #include "ray.h"
 
-class Sphere : public Shape
+struct Sphere : Shape
 {
     public:
         double r;
@@ -14,4 +14,5 @@ class Sphere : public Shape
         Vec Normal(Vec &v) override;
         void Translate(Vec &x) override;
         bool IsOnSkin(Vec &x) override;
+        double FarSolution(Ray &ray) override;
 };
