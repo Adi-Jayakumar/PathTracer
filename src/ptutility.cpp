@@ -14,13 +14,13 @@ double PTUtility::Random()
     return dist(prng);
 }
 
-double PTUtility::SolveQuadratic(double A, double B, double C)
+std::pair<double, double> PTUtility::SolveQuadratic(double A, double B, double C)
 {
     double discriminant = B * B - 4 * A * C;
 
     // Checking solutions exist
     if (discriminant < 0)
-        return std::numeric_limits<double>::max();
+        return { std::numeric_limits<double>::max(), std::numeric_limits<double>::max() };
 
     // Finding both
     double t1 = (-B - sqrt(discriminant)) / (2 * A);
@@ -29,23 +29,5 @@ double PTUtility::SolveQuadratic(double A, double B, double C)
     if (t2 <= t1)
         std::swap(t1, t2);
 
-    // We now know that t1 < t2
-    if (t2 < 0)
-        return std::numeric_limits<double>::max();
-    else if (t1 >= 0)
-    {
-        if (t1 > PTUtility::EPSILON)
-            return t1;
-        else
-            return std::numeric_limits<double>::max();
-    }
-    else if (t1 < 0)
-    {
-        if (t2 > PTUtility::EPSILON)
-            return t2;
-        else
-            return std::numeric_limits<double>::max();
-    }
-
-    return std::numeric_limits<double>::max();
+    return { t1, t2 };
 }

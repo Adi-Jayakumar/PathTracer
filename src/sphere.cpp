@@ -9,17 +9,31 @@ Sphere::Sphere(double _r, Vec _c)
     c = _c;
 }
 
-bool Sphere::Intersect(Ray &ray, double &hit)
+bool Sphere::Intersect(Ray &ray, double &hit, std::shared_ptr<std::pair<double, double>> values)
 {
     double A = Vec::Dot(ray.d, ray.d);
     double B = 2 * Vec::Dot(ray.o, ray.d) - 2 * Vec::Dot(c, ray.d);
     double C = Vec::Dot(ray.o, ray.o) + Vec::Dot(c, c) - 2 * Vec::Dot(ray.o, c) - r * r;
+    bool didHit = false;
 
-    hit = PTUtility::SolveQuadratic(A, B, C);
-    if (hit == std::numeric_limits<double>::max())
-        return false;
-    else
-        return true;
+    std::pair<double, double> vals = PTUtility::SolveQuadratic(A, B, C);
+    if (values != nullptr)
+    {
+        values->first = vals.first;
+        values->second = vals.second;
+    }
+    hit = std::numeric_limits<double>::max();
+    if (vals.first > PTUtility::EPSILON && vals.first != std::numeric_limits<double>::max())
+    {
+        didHit = true;
+        hit = vals.first;
+    }
+    else if (vals.second > PTUtility::EPSILON && vals.second != std::numeric_limits<double>::max())
+    {
+        didHit = true;
+        hit = vals.second;
+    }
+    return didHit;
 };
 
 Vec Sphere::Normal(Vec &v)
@@ -35,22 +49,4 @@ void Sphere::Translate(Vec &x)
 bool Sphere::IsOnSkin(Vec &x)
 {
     return fabs((x - c).ModSq() - r * r) < PTUtility::EPSILON;
-}
-
-double Sphere::FarSolution(Ray &ray)
-{
-    double A = Vec::Dot(ray.d, ray.d);
-    double B = 2 * Vec::Dot(ray.o, ray.d) - 2 * Vec::Dot(c, ray.d);
-    double C = Vec::Dot(ray.o, ray.o) + Vec::Dot(c, c) - 2 * Vec::Dot(ray.o, c) - r * r;
-
-    double t1 = (-B - sqrt(B * B - 4 * A * C)) / (2 * A);
-    double t2 = (-B + sqrt(B * B - 4 * A * C)) / (2 * A);
-
-    if (t1 < t2)
-        std::swap(t1, t2);
-
-    if (t2 > 0)
-        return t2;
-
-    return std::numeric_limits<double>::max();
 }

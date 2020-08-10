@@ -158,11 +158,11 @@ void Scene::TakePicture(int index)
     int rowCount;
 
     std::cout << std::endl
-              << std::endl
-              << "Started casting rays" << std::endl
-              << "Number of rays cast: " << PTUtility::W * PTUtility::H * PTUtility::NumSamps * PTUtility::SubPixSize * PTUtility::SubPixSize << std::endl
-              << std::endl;
-#pragma omp parallel for schedule(dynamic, 1) private(r)
+        << std::endl
+        << "Started casting rays" << std::endl
+        << "Number of rays cast: " << PTUtility::W * PTUtility::H * PTUtility::NumSamps * PTUtility::SubPixSize * PTUtility::SubPixSize << std::endl
+        << std::endl;
+    #pragma omp parallel for schedule(dynamic, 1) private(r)
     // image rows
     for (int i = 0; i < PTUtility::H; i++)
     {
@@ -196,18 +196,25 @@ void Scene::TakePicture(int index)
 
 void Scene::LoadCornell(double boxSize)
 {
-    std::shared_ptr front = std::make_shared<Plane>(Vec(0, 0, -1), Vec(0, 0, boxSize));
-    std::shared_ptr right = std::make_shared<Plane>(Vec(-1, 0, 0), Vec(boxSize, 0, 0));
-    std::shared_ptr back = std::make_shared<Plane>(Vec(0, 0, 1), Vec(0, 0, -boxSize));
-    std::shared_ptr left = std::make_shared<Plane>(Vec(1, 0, 0), Vec(-boxSize, 0, 0));
-    std::shared_ptr top = std::make_shared<Plane>(Vec(0, -1, 0), Vec(0, boxSize, 0));
-    std::shared_ptr bottom = std::make_shared<Plane>(Vec(0, 1, 0), Vec(0., -boxSize, 0));
+    std::shared_ptr<Plane> front = std::make_shared<Plane>(Vec(0, 0, -1), Vec(0, 0, boxSize));
+    std::shared_ptr<Plane> right = std::make_shared<Plane>(Vec(-1, 0, 0), Vec(boxSize, 0, 0));
+    std::shared_ptr<Plane> back = std::make_shared<Plane>(Vec(0, 0, 1), Vec(0, 0, -boxSize));
+    std::shared_ptr<Plane> left = std::make_shared<Plane>(Vec(1, 0, 0), Vec(-boxSize, 0, 0));
+    std::shared_ptr<Plane> top = std::make_shared<Plane>(Vec(0, -1, 0), Vec(0, boxSize, 0));
+    std::shared_ptr<Plane> bottom = std::make_shared<Plane>(Vec(0, 1, 0), Vec(0., -boxSize, 0));
     objects.emplace_back(Solid(front, Vec(), Vec(1, 1, 1), Surface::DIFF));
     objects.emplace_back(Solid(right, Vec(), Vec(0, 1, 0), Surface::DIFF));
     objects.emplace_back(Solid(back, Vec(), Vec(), Surface::DIFF));
     objects.emplace_back(Solid(left, Vec(), Vec(1, 0, 0), Surface::DIFF));
-    objects.emplace_back(Solid(top, Vec(1, 1, 1), Vec(), Surface::DIFF));
+    // objects.emplace_back(Solid(top, Vec(1, 1, 1), Vec(), Surface::DIFF));
+    objects.emplace_back(Solid(top, Vec(), Vec(1, 1, 1), Surface::DIFF));
     objects.emplace_back(Solid(bottom, Vec(), Vec(1, 1, 1), Surface::DIFF));
+
+    std::shared_ptr<Sphere> lightSphere = std::make_shared<Sphere>(boxSize/2, Vec(0, boxSize - 0.001, 0));
+    std::shared_ptr<Plane> lightPlane = std::make_shared<Plane>(Vec(0, -1, 0), Vec(0, boxSize - 0.001, 0));
+    std::shared_ptr<Shape> light = lightSphere & lightPlane;
+    objects.emplace_back(Solid(light, Vec(1, 1, 1), Vec(), Surface::DIFF));
+
 }
 
 void Scene::LoadOBJModel(std::string fPath)

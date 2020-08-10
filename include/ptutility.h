@@ -4,9 +4,9 @@
 namespace PTUtility
 {
     // image parameters
-    const int W = 100;
-    const int H = 100;
-    const int NumSamps = 400;
+    const int W = 200;
+    const int H = 200;
+    const int NumSamps = 500;
     const int SubPixSize = 2;
 
     // geometric constant pi
@@ -29,5 +29,5 @@ namespace PTUtility
     /* solves the qudratic At^2 + Bt + C = 0 and checks solutions 
     are within tolerances and are positive, if no solutions 
     returns double's max value */
-    double SolveQuadratic(double A, double B, double C);
+    std::pair<double, double> SolveQuadratic(double A, double B, double C);
 }
