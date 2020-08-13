@@ -16,19 +16,14 @@ int main()
 {
 
     Scene scene;
-    Camera CamUp = Camera(2, PTUtility::W, PTUtility::H, Vec(0, 0, -1.99), Vec(0, 0, 1), Vec(0, 1, 0), PTUtility::PI / 3.0);
-    scene.AddCamera(CamUp);
 
-    scene.LoadCornell(2);
+    scene.LoadCornell(10);
+    std::shared_ptr<Sphere> mirror = std::make_shared<Sphere>(5, Vec(-5, -5, 2));
+    std::shared_ptr<Sphere> glass = std::make_shared<Sphere>(5, Vec(5, -5, -5));
+    scene.AddSolid(Solid(mirror, Vec(), Vec(1, 1, 1), Surface::SPEC));
+    scene.AddSolid(Solid(glass, Vec(), Vec(1, 1, 1), Surface::REFRGLOSS));
 
-    std::shared_ptr<Sphere> left = std::make_shared<Sphere>(1, Vec(0, 0, 0));
-    std::shared_ptr<Sphere> right = std::make_shared<Sphere>(1, Vec(0, 1.25, 0));
-    // std::shared_ptr<Sphere> top = std::make_shared<Sphere>(1, Vec(0, 0.75, 1));
 
-    std::shared_ptr<Shape> comp = (left - right);
-    scene.AddSolid(Solid(comp, Vec(), Vec(1, 0, 1), Surface::DIFF));
-    // scene.AddSolid(Solid(left, Vec(), Vec(1,0,1), Surface::DIFF));
-    // scene.AddSolid(Solid(right, Vec(), Vec(0, 1, 1), Surface::DIFF));
 
     // clock start
     auto start = std::chrono::high_resolution_clock::now();

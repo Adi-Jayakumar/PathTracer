@@ -4,10 +4,10 @@
 namespace PTUtility
 {
     // image parameters
-    const int W = 200;
-    const int H = 200;
-    const int NumSamps = 500;
-    const int SubPixSize = 2;
+    const long int W = 500;
+    const long int H = 500;
+    const long int NumSamps = 500;
+    const long int SubPixSize = 2;
 
     // geometric constant pi
     const double PI = 3.1415926535897932384626433832795;
@@ -26,8 +26,8 @@ namespace PTUtility
     // non deterministic RNG between 0 and 1
     double Random();
 
-    /* solves the qudratic At^2 + Bt + C = 0 and checks solutions 
-    are within tolerances and are positive, if no solutions 
+    /* solves the qudratic At^2 + Bt + C = 0 and checks solutions
+    are within tolerances and are positive, if no solutions
     returns double's max value */
     std::pair<double, double> SolveQuadratic(double A, double B, double C);
 }

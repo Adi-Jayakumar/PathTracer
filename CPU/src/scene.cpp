@@ -99,6 +99,100 @@ Vec Scene::RayColour(Ray r, int depth)
         Vec reflectedDir = r.d - normal * 2 * Vec::Dot(normal, r.d);
         return hit.e + albedo * RayColour(Ray(hitPt, reflectedDir), depth);
     }
+    else if (hit.s == Surface::SPECGLOSS)
+    {
+        Vec specReflDir = r.d - normal * 2 * Vec::Dot(normal, r.d);
+        Vec w = specReflDir.Norm();
+        Vec u = Vec(w.z, w.z, -w.x - 2 * w.y).Norm();
+        Vec v = Vec::Cross(u, w).Norm();
+
+        double rad = 0.125 * sqrt(PTUtility::Random());
+        double theta = PTUtility::Random() * 2 * PTUtility::PI;
+
+        double xPrime = rad * cos(theta);
+        double yPrime = rad * sin(theta);
+
+        Vec newDir = (u * xPrime + v * yPrime + w).Norm();
+        return hit.e + albedo * RayColour(Ray(hitPt, newDir), depth);
+    }
+    else if (hit.s == Surface::REFRGLOSS)
+    {
+        // perfect reflected direction whcih we now need to jitter
+        Vec specReflDir = r.d - normal * 2 * Vec::Dot(normal, r.d);
+        Vec w = specReflDir.Norm();
+        Vec u = Vec(w.z, w.z, -w.x - 2 * w.y).Norm();
+        Vec v = Vec::Cross(u, w).Norm();
+
+        double rad = 0.125 * sqrt(PTUtility::Random());
+        double theta = PTUtility::Random() * 2 * PTUtility::PI;
+
+        double xPrime = rad * cos(theta);
+        double yPrime = rad * sin(theta);
+
+        // jittered reflected direction
+        Vec reflDir = (u * xPrime + v * yPrime + w).Norm();
+        // jittered refrlected ray
+        Ray reflRay = Ray(hitPt, reflDir);
+
+        // is the ray going into the object or out?
+        bool isInto = Vec::Dot(normal, rayNormal) > 0;
+
+        // refractive indices
+        double n1 = 1;
+        double n2 = 1.5;
+        double netN = isInto ? n1 / n2 : n2 / n1;
+
+        // cosines of the angles
+        double cosTheta = Vec::Dot(r.d, rayNormal);
+        double cosTheta2Sqr = 1 - netN * netN * (1 - cosTheta * cosTheta);
+
+        // total internal reflection
+        if (cosTheta2Sqr < 0)
+            return hit.e + albedo * RayColour(reflRay, depth);
+
+        
+        // perfect refracted direction whcih we now need to jitter
+        Vec specRefrDir = (r.d * netN - normal * ((isInto ? 1 : -1) * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
+        w = specRefrDir.Norm();
+        u = Vec(w.z, w.z, -w.x - 2 * w.y).Norm();
+        v = Vec::Cross(u, w).Norm();
+
+        rad = 0.03125 * sqrt(PTUtility::Random());
+        theta = PTUtility::Random() * 2 * PTUtility::PI;
+
+        xPrime = rad * cos(theta);
+        yPrime = rad * sin(theta);
+        
+        // jittered refracted direction
+        Vec refrDir = (u * xPrime + v * yPrime + w).Norm();
+        // jittered refracted ray
+        Ray refrRay = Ray(hitPt, refrDir);
+
+        double a = n2 - n1;
+        double b = n1 + n2;
+        double R0 = (a * a) / (b * b);
+
+        double cosTheta2 = Vec::Dot(refrDir, normal);
+        double c = 1 - (isInto ? -cosTheta : cosTheta2);
+        double refl = R0 + (1 - R0) * c * c * c * c;
+        double refr = 1 - refl;
+
+        double P = 0.25 + 0.5 * refl;
+
+        double reflectionWeight = refl / P;
+        double refractionWeight = refr / (1 - P);
+
+        if (depth < 3)
+            return hit.e + albedo * (RayColour(reflRay, depth) * refl + RayColour(refrRay, depth) * refr);
+        else
+        {
+            if (PTUtility::Random() < P)
+                return hit.e + albedo * RayColour(reflRay, depth) * reflectionWeight;
+            else
+                return hit.e + albedo * RayColour(refrRay, depth) * refractionWeight;
+        }
+
+    }
     else if (hit.s == Surface::REFR)
     {
         Ray reflectedRay = Ray(hitPt, r.d - normal * 2 * Vec::Dot(normal, r.d));
@@ -119,15 +213,16 @@ Vec Scene::RayColour(Ray r, int depth)
         if (cosTheta2Sqr < 0)
             return hit.e + albedo * RayColour(reflectedRay, depth);
 
-        Vec rerfactedDir = (r.d * netN - normal * ((isInto ? 1 : -1) * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
-        // Vec rerfactedDir = (r.d * netN - rayNormal * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
+        Vec refractedDir = (r.d * netN - normal * ((isInto ? 1 : -1) * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
+        Ray refractedRay = Ray(hitPt, refractedDir);
+        // Vec refractedDir = (r.d * netN - rayNormal * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
 
-        // approximating reflection and refraction weights
+    // approximating reflection and refraction weights
         double a = n2 - n1;
         double b = n1 + n2;
         double R0 = (a * a) / (b * b);
 
-        double cosTheta2 = Vec::Dot(rerfactedDir, normal);
+        double cosTheta2 = Vec::Dot(refractedDir, normal);
         double c = 1 - (isInto ? -cosTheta : cosTheta2);
         double refl = R0 + (1 - R0) * c * c * c * c;
         double refr = 1 - refl;
@@ -138,13 +233,13 @@ Vec Scene::RayColour(Ray r, int depth)
         double refractionWeight = refr / (1 - P);
 
         if (depth < 3)
-            return hit.e + albedo * (RayColour(reflectedRay, depth) * refl + RayColour(Ray(hitPt, rerfactedDir), depth) * refr);
+            return hit.e + albedo * (RayColour(reflectedRay, depth) * refl + RayColour(refractedRay, depth) * refr);
         else
         {
             if (PTUtility::Random() < P)
                 return hit.e + albedo * RayColour(reflectedRay, depth) * reflectionWeight;
             else
-                return hit.e + albedo * RayColour(Ray(hitPt, rerfactedDir), depth) * refractionWeight;
+                return hit.e + albedo * RayColour(refractedRay, depth) * refractionWeight;
         }
     }
     return Vec();
@@ -157,10 +252,12 @@ void Scene::TakePicture(int index)
     Ray r;
     int rowCount;
 
+    int numRays = PTUtility::W * PTUtility::H * PTUtility::NumSamps * PTUtility::SubPixSize * PTUtility::SubPixSize;
+
     std::cout << std::endl
         << std::endl
         << "Started casting rays" << std::endl
-        << "Number of rays cast: " << PTUtility::W * PTUtility::H * PTUtility::NumSamps * PTUtility::SubPixSize * PTUtility::SubPixSize << std::endl
+        << "Number of rays cast: " << numRays << " (~10^" << floor(log10(numRays)) << ")" << std::endl
         << std::endl;
     #pragma omp parallel for schedule(dynamic, 1) private(r)
     // image rows
@@ -196,6 +293,8 @@ void Scene::TakePicture(int index)
 
 void Scene::LoadCornell(double boxSize)
 {
+    Camera cam = Camera(boxSize * 2, PTUtility::W, PTUtility::H, Vec(0, 0, -boxSize + 0.001), Vec(0, 0, 1), Vec(0, 1, 0), PTUtility::PI / 3.0);
+    cameras.emplace_back(cam);
     std::shared_ptr<Plane> front = std::make_shared<Plane>(Vec(0, 0, -1), Vec(0, 0, boxSize));
     std::shared_ptr<Plane> right = std::make_shared<Plane>(Vec(-1, 0, 0), Vec(boxSize, 0, 0));
     std::shared_ptr<Plane> back = std::make_shared<Plane>(Vec(0, 0, 1), Vec(0, 0, -boxSize));
@@ -206,14 +305,8 @@ void Scene::LoadCornell(double boxSize)
     objects.emplace_back(Solid(right, Vec(), Vec(0, 1, 0), Surface::DIFF));
     objects.emplace_back(Solid(back, Vec(), Vec(), Surface::DIFF));
     objects.emplace_back(Solid(left, Vec(), Vec(1, 0, 0), Surface::DIFF));
-    // objects.emplace_back(Solid(top, Vec(1, 1, 1), Vec(), Surface::DIFF));
-    objects.emplace_back(Solid(top, Vec(), Vec(1, 1, 1), Surface::DIFF));
+    objects.emplace_back(Solid(top, Vec(1, 1, 1), Vec(), Surface::DIFF));
     objects.emplace_back(Solid(bottom, Vec(), Vec(1, 1, 1), Surface::DIFF));
-
-    std::shared_ptr<Sphere> lightSphere = std::make_shared<Sphere>(boxSize/2, Vec(0, boxSize - 0.001, 0));
-    std::shared_ptr<Plane> lightPlane = std::make_shared<Plane>(Vec(0, -1, 0), Vec(0, boxSize - 0.001, 0));
-    std::shared_ptr<Shape> light = lightSphere & lightPlane;
-    objects.emplace_back(Solid(light, Vec(1, 1, 1), Vec(), Surface::DIFF));
 
 }
 

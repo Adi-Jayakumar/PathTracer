@@ -8,12 +8,13 @@ enum class Surface
 {
     DIFF,
     SPEC,
-    REFR
+    SPECGLOSS,
+    REFRGLOSS,
+    REFR,
 };
 
 struct Solid
 {
-public:
     std::shared_ptr<Shape> shape;
     Vec e, c;
     Surface s;

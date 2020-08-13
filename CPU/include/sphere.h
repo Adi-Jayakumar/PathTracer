@@ -5,7 +5,6 @@
 
 struct Sphere : Shape
 {
-public:
     double r;
     Vec c;
     Sphere(double _r, Vec _c);

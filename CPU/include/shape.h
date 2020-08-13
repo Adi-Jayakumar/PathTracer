@@ -14,8 +14,4 @@ struct Shape
 
     // these 2 are used in Composite
     virtual bool IsOnSkin(Vec &x) = 0;
-
-    friend std::shared_ptr<Shape> operator&(std::shared_ptr<Shape> lhs, std::shared_ptr<Shape> rhs);
-    friend std::shared_ptr<Shape> operator|(std::shared_ptr<Shape> lhs, std::shared_ptr<Shape> rhs);
-    friend std::shared_ptr<Shape> operator-(std::shared_ptr<Shape> lhs, std::shared_ptr<Shape> rhs);
 };
