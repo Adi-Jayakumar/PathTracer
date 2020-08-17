@@ -1,13 +1,13 @@
-#include "camera.cuh"
+#include "camera.h"
 #include "cuda_device_runtime_api.h"
-#include "hitrecord.cuh"
-#include "image.cuh"
-#include "ptutility.cuh"
-#include "scene.cuh"
-#include "solid.cuh"
-#include "sphere.cuh"
-#include "plane.cuh"
-#include "vector.cuh"
+#include "hitrecord.h"
+#include "image.h"
+#include "ptutility.h"
+#include "scene.h"
+#include "solid.h"
+#include "sphere.h"
+#include "plane.h"
+#include "vector.h"
 #include <curand_kernel.h>
 #include <iostream>
 #include <time.h>
@@ -52,8 +52,8 @@ __global__ void CreateWorld(Solid **objects)
         *(objects + 4) = new Solid(top, Vec(1, 1, 1), Vec(), Surface::DIFF);
         *(objects + 5) = new Solid(bottom, Vec(), Vec(1, 1, 1), Surface::DIFF);
         
-        *(objects + 6) = new Solid(new Sphere(5, Vec(-5, -5, 5)), Vec(), Vec(1,1,1), Surface::SPECGLOSS);
-        // *(objects + 6) = new Solid(new Sphere(5, Vec()), Vec(), Vec(1,1,1), Surface::REFR);
+        *(objects + 6) = new Solid(new Sphere(5, Vec(-5, -5, 2)), Vec(), Vec(1,1,1), Surface::SPEC);
+        *(objects + 7) = new Solid(new Sphere(5, Vec(5, -5, -5)), Vec(), Vec(1, 1, 1), Surface::REFRGLOSS);
     }
     
 }
@@ -118,7 +118,7 @@ int main()
 
     int num_pixels = PTUtility::W * PTUtility::H;
     size_t fb_size = num_pixels * sizeof(Vec);
-    int nObj = 7;
+    int nObj = 8;
 
     Solid **objects;
     checkCudaErrors(cudaMalloc((void **)&objects, sizeof(Solid *)));

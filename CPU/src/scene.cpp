@@ -8,8 +8,6 @@
 #include <memory>
 #include <sstream>
 
-using namespace std;
-
 void Scene::AddSolid(Solid s)
 {
     objects.push_back(s);

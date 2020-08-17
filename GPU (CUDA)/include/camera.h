@@ -1,7 +1,7 @@
 #pragma once
-#include "vector.cuh"
-#include "ray.cuh"
-#include "ptutility.cuh"
+#include "vector.h"
+#include "ray.h"
+#include "ptutility.h"
 #include <curand_kernel.h>
 
 struct Camera

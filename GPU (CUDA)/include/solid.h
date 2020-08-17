@@ -1,6 +1,6 @@
 #pragma once
-#include "shape.cuh"
-#include "ptutility.cuh"
+#include "shape.h"
+#include "ptutility.h"
 
 enum class Surface
 {

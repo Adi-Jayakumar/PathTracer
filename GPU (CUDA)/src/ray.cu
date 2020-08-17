@@ -1,5 +1,5 @@
 #include <iostream>
-#include "ray.cuh"
+#include "ray.h"
 
 __device__ Ray::Ray()
 {

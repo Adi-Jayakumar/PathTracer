@@ -1,7 +1,7 @@
 #include <cmath>
 #include <random>
 
-#include "ptutility.cuh"
+#include "ptutility.h"
 __device__ double PTUtility::Luma(const Vec &colour)
 {
     return Vec::Dot(colour, Vec(0.2126, 0.7152, 0.0722));

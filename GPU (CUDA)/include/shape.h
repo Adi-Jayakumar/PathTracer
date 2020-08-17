@@ -1,6 +1,6 @@
 #pragma once
-#include "ptutility.cuh"
-#include "ray.cuh"
+#include "ptutility.h"
+#include "ray.h"
 #include <memory>
 #include <vector>
 

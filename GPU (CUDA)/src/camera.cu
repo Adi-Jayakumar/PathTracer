@@ -1,4 +1,4 @@
-#include "camera.cuh"
+#include "camera.h"
 
 __device__ Camera::Camera()
 {

@@ -1,7 +1,7 @@
 #pragma once
-#include "vector.cuh"
-#include "shape.cuh"
-#include "ray.cuh"
+#include "vector.h"
+#include "shape.h"
+#include "ray.h"
 
 
 struct Sphere : Shape

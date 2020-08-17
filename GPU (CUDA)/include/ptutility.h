@@ -1,7 +1,7 @@
 #pragma once
 #include <curand_kernel.h>
-#include "pair.cuh"
-#include "vector.cuh"
+#include "pair.h"
+#include "vector.h"
 
 namespace PTUtility
 {
@@ -19,7 +19,7 @@ namespace PTUtility
     const double INF = 1e300;
 
     // maximum recursion depth
-    const int MaxDepth = 3;
+    const int MaxDepth = 6;
 
     /* maps an rgb colour to a grayscale value betweeon 0 and 1
     to determine Russian Roulette probability for termination

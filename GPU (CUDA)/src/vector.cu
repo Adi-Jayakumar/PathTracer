@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#include "vector.cuh"
+#include "vector.h"
 
 __host__ __device__ Vec::Vec()
 {

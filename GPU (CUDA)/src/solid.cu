@@ -1,4 +1,4 @@
-#include "solid.cuh"
+#include "solid.h"
 
 __device__ __host__ Solid::Solid()
 {

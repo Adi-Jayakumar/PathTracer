@@ -1,5 +1,5 @@
-#include "sphere.cuh"
-#include "pair.cuh"
+#include "sphere.h"
+#include "pair.h"
 #include <cmath>
 #include <limits>
 

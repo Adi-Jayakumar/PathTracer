@@ -1,5 +1,5 @@
 #include <iostream>
-#include "hitrecord.cuh"
+#include "hitrecord.h"
 
 __device__ HitRecord::HitRecord(double _t, int _id)
 {   

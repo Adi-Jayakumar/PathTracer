@@ -1,4 +1,4 @@
-#include "plane.cuh"
+#include "plane.h"
 
 __device__ Plane::Plane(Vec _n, Vec _p)
 {

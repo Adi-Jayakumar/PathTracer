@@ -1,5 +1,5 @@
-#include "image.cuh"
-#include "scene.cuh"
+#include "image.h"
+#include "scene.h"
 #include <curand_kernel.h>
 
 __device__ HitRecord Scene::ClosestIntersection(Ray r, Solid **objects, int nObj)
@@ -27,8 +27,7 @@ __device__ HitRecord Scene::ClosestIntersection(Ray r, Solid **objects, int nObj
     return HitRecord(recordT, idMin);
 }
 
-
-__device__ Ray Scene::GenerateDiffuseRay(Vec& hitPt, Vec& normal, curandState &state)
+__device__ Ray Scene::GenerateDiffuseRay(Vec &hitPt, Vec &normal, curandState &state)
 {
     double phi = 2 * PTUtility::PI * PTUtility::Random(state);
     double r2 = PTUtility::Random(state);
@@ -46,9 +45,9 @@ __device__ Ray Scene::GenerateDiffuseRay(Vec& hitPt, Vec& normal, curandState &s
     return Ray(hitPt, newDir);
 }
 
-__device__ Ray Scene::GenerateSpecularRay(Vec &hitPt, Vec &normal, Vec &dir)
+__device__ Ray Scene::GenerateSpecularRay(Vec &hitPt, Vec &rayNormal, Vec &dir)
 {
-    Vec reflectedDir = dir - normal * 2 * Vec::Dot(normal, dir);
+    Vec reflectedDir = dir - rayNormal * 2 * Vec::Dot(rayNormal, dir);
     return Ray(hitPt, reflectedDir);
 }
 
@@ -75,59 +74,104 @@ __device__ Vec Scene::RayColour(Ray r, Solid **objects, curandState &state, int 
     // would just overflow
 
     Vec awayColour = Vec(0, 0, 0);
-    Vec mask = Vec(1, 1, 1);
-    HitRecord awayRec;
-    double awayWeight = 1;
-
-    bool isTrans = false;
-
-    Ray transRay = Ray();
-    Vec transColour = Vec(0, 0, 0);
-    Vec transMask = Vec(1, 1, 1);
-    HitRecord transRec;
-    double transWeight = 0;
+    Vec awayMask = Vec(1, 1, 1);
+    HitRecord rec;
 
     for (int i = 0; i < PTUtility::MaxDepth; i++)
     {
 
-        awayRec = Scene::ClosestIntersection(r, objects, nObj);
-        transRec = Scene::ClosestIntersection(transRay, objects, nObj);
-
-        if (awayRec.id == -1)
+        rec = Scene::ClosestIntersection(r, objects, nObj);
+        if (rec.id == -1)
             return Vec();
 
         // pointer to the object that was hit
-        Solid *hit = objects[awayRec.id];
+        Solid *hit = objects[rec.id];
         // point that was hit
-        Vec hitPt = r.o + r.d * awayRec.t;
+        Vec hitPt = r.o + r.d * rec.t;
         // outward normal at that point
         Vec normal = hit->shape->Normal(hitPt);
         // normal that points in the direction of the ray
         Vec rayNormal = Vec::Dot(normal, r.d) < 0 ? normal : normal * -1;
 
-        awayColour = awayColour + mask * hit->e;
-        mask = mask * hit->c;
+        awayColour = awayColour + hit->e * awayMask;
 
         if (hit->s == Surface::DIFF)
         {
             r = Scene::GenerateDiffuseRay(hitPt, rayNormal, state);
-            mask = mask * Vec::Dot(r.d, rayNormal);
+            awayMask = awayMask * Vec::Dot(r.d, rayNormal);
+            awayMask = awayMask * hit->c;
         }
         else if (hit->s == Surface::SPEC || hit->s == Surface::SPECGLOSS)
         {
             Ray cand = Scene::GenerateSpecularRay(hitPt, normal, r.d);
-            if(hit->s == Surface::SPEC)
+            awayMask = awayMask * hit->c;
+            if (hit->s == Surface::SPEC)
                 r = cand;
             else
                 r = Ray(hitPt, Scene::Jitter(cand.d, 0.125, state));
-
         }
-        // else if (hit->s == Surface::REFR || hit->s == Surface::REFRGLOSS)
-        // {
-        //     isTrans = true;
-            
-        // }
+        else if (hit->s == Surface::REFR || hit->s == Surface::REFRGLOSS)
+        {
+            Ray reflectedRay = Ray(hitPt, r.d - normal * 2 * Vec::Dot(normal, r.d));
+
+            // is the ray going into the object or out?
+            bool isInto = Vec::Dot(normal, rayNormal) > 0;
+
+            // refractive indices
+            double n1 = 1;
+            double n2 = 1.5;
+            double netN = isInto ? n1 / n2 : n2 / n1;
+
+            // cosines of the angles
+            double cosTheta = Vec::Dot(r.d, rayNormal);
+            double cosTheta2Sqr = 1 - netN * netN * (1 - cosTheta * cosTheta);
+
+            // total internal reflection
+            if (cosTheta2Sqr < 0)
+            {
+                r = reflectedRay;
+                if(hit->s == Surface::REFRGLOSS)
+                    r.d = Scene::Jitter(r.d, 0.125, state);
+            }
+            else
+            {
+                Vec refractedDir = (r.d * netN - normal * ((isInto ? 1 : -1) * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
+                Ray refractedRay = Ray(hitPt, refractedDir);
+                // Vec refractedDir = (r.d * netN - rayNormal * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
+
+                // approximating reflection and refraction weights
+                double a = n2 - n1;
+                double b = n1 + n2;
+                double R0 = (a * a) / (b * b);
+
+                double cosTheta2 = Vec::Dot(refractedDir, normal);
+                double c = 1 - (isInto ? -cosTheta : cosTheta2);
+                double refl = R0 + (1 - R0) * c * c * c * c * c;
+                double refr = 1 - refl;
+
+                double P = 0.25 + 0.5 * refl;
+
+                double reflectionWeight = refl / P;
+                double refractionWeight = refr / (1 - P);
+
+                if (PTUtility::Random(state) < P)
+                {
+                    awayMask = awayMask * reflectionWeight;
+                    r = reflectedRay;
+                    if(hit->s == Surface::REFRGLOSS)
+                        r.d = Scene::Jitter(r.d, 0.125, state);
+                        
+                }
+                else
+                {
+                    awayMask = awayMask * refractionWeight;
+                    r = refractedRay;
+                    if (hit->s == Surface::REFRGLOSS)
+                        r.d = Scene::Jitter(r.d, 0.03125, state);
+                }
+            }
+        }
     }
 
-    return awayColour * awayWeight + transColour * transWeight;
+    return awayColour;
 }
