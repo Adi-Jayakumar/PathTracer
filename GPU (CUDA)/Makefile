@@ -1,6 +1,6 @@
 
 CC		:= nvcc 
-C_FLAGS := -std=c++11 -rdc=true
+C_FLAGS := -std=c++11 -rdc=true -O3 -Xptxas -O3
 
 BIN		:= bin
 SRC		:= src
