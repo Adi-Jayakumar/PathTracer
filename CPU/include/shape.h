@@ -1,8 +1,6 @@
 #pragma once
-#include "ptutility.h"
+#include "image.h"
 #include "ray.h"
-#include <memory>
-#include <vector>
 
 struct Shape
 {

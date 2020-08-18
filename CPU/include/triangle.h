@@ -2,6 +2,8 @@
 #include "ray.h"
 #include "shape.h"
 #include "vector.h"
+#include "ptutility.h"
+#include <memory>
 
 struct Triangle : Shape
 {

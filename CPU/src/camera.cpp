@@ -1,7 +1,4 @@
-#include <cmath>
-#include <iostream>
 #include "camera.h"
-#include "hitrecord.h"
 
 Camera::Camera(double _worldW, int _nPixelsX, int _nPixelsY, Vec _loc, Vec _forward, Vec _up, double _hFOV)
 {

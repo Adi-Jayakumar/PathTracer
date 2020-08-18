@@ -1,22 +1,22 @@
 #pragma once
 #include "vector.h"
+#include <cmath>
+#include <random>
 
 namespace PTUtility
 {
     // image parameters
-    const long int W = 500;
-    const long int H = 500;
-    const long int NumSamps = 500;
-    const long int SubPixSize = 2;
+    inline long int W = 100;
+    inline long int H = 100;
+    inline long int NumSamps = 200;
+    inline long int SubPixSize = 2;
+    inline int MaxDepth = 10;
 
     // geometric constant pi
     const double PI = 3.1415926535897932384626433832795;
 
     // error tolerance for Ray-Shape intersections
     const double EPSILON = 1e-7;
-
-    // maximum recursion depth
-    const int MaxDepth = 10;
 
     /* maps an rgb colour to a grayscale value betweeon 0 and 1
     to determine Russian Roulette probability for termination

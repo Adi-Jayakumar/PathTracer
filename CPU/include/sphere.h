@@ -1,7 +1,11 @@
 #pragma once
-#include "vector.h"
-#include "shape.h"
+#include "ptutility.h"
 #include "ray.h"
+#include "shape.h"
+#include "vector.h"
+#include <cmath>
+#include <limits>
+#include <memory>
 
 struct Sphere : Shape
 {

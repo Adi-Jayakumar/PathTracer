@@ -1,4 +1,4 @@
-#include <iostream>
+
 #include "hitrecord.h"
 
 HitRecord::HitRecord(double _t, int _id)

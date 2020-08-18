@@ -1,7 +1,8 @@
 #pragma once
-#include <vector>
-#include "solid.h"
-#include "sphere.h"
+#include "vector.h"
+#include "ray.h"
+#include "ptutility.h"
+#include <cmath>
 
 struct Camera
 {

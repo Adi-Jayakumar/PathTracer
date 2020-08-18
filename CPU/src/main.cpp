@@ -12,7 +12,7 @@
 #include <iostream>
 
 // RUN: clear && make && ./bin/main
-int main()
+int main(int argc, char **argv)
 {
 
     Scene scene;
@@ -22,8 +22,6 @@ int main()
     std::shared_ptr<Sphere> glass = std::make_shared<Sphere>(5, Vec(5, -5, -5));
     scene.AddSolid(Solid(mirror, Vec(), Vec(1, 1, 1), Surface::SPEC));
     scene.AddSolid(Solid(glass, Vec(), Vec(1, 1, 1), Surface::REFRGLOSS));
-
-
 
     // clock start
     auto start = std::chrono::high_resolution_clock::now();

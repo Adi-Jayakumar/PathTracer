@@ -1,4 +1,3 @@
-#include <cmath>
 #include "image.h"
 
 Image::Image(int _dimX, int _dimY, int index)

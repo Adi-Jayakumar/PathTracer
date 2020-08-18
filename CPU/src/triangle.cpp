@@ -1,5 +1,4 @@
 #include "triangle.h"
-#include <cmath>
 
 Triangle::Triangle(Vec _p1, Vec _p2, Vec _p3)
 {

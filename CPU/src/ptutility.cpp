@@ -1,5 +1,4 @@
-#include <cmath>
-#include <random>
+
 #include "ptutility.h"
 
 double PTUtility::Luma(const Vec &colour)

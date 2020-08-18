@@ -1,4 +1,3 @@
-#include <iostream>
 #include "ray.h"
 
 Ray::Ray()

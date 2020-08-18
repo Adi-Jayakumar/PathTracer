@@ -1,6 +1,5 @@
 #include "sphere.h"
-#include <cmath>
-#include <limits>
+
 
 Sphere::Sphere(double _r, Vec _c)
 {

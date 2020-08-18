@@ -1,6 +1,5 @@
 #include "plane.h"
-#include <cmath>
-#include <limits>
+
 
 Plane::Plane(Vec _n, Vec _p)
 {

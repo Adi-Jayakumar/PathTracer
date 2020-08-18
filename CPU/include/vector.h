@@ -1,5 +1,6 @@
 #pragma once
-#include <ostream>
+#include <cmath>
+#include <iostream>
 struct Vec
 {
     double x, y, z; // x, y, z components

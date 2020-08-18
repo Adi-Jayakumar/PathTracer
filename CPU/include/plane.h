@@ -1,5 +1,7 @@
 #pragma once
 #include "shape.h"
+#include <cmath>
+#include <limits>
 
 struct Plane : Shape
 {

@@ -4,6 +4,12 @@
 #include "solid.h"
 #include "sphere.h"
 #include "triangle.h"
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <sstream>
 
 struct Scene
 {

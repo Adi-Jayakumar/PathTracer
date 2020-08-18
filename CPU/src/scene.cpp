@@ -1,12 +1,4 @@
 #include "scene.h"
-#include "image.h"
-#include "plane.h"
-#include <cmath>
-#include <fstream>
-#include <iostream>
-#include <limits>
-#include <memory>
-#include <sstream>
 
 void Scene::AddSolid(Solid s)
 {

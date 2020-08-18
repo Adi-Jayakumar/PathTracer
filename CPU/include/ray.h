@@ -1,5 +1,6 @@
 #pragma once
 #include "vector.h"
+#include <iostream>
 struct Ray
 {   
     Vec o, d; // origin, direction
