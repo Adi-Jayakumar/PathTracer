@@ -1,5 +1,7 @@
 #pragma once
 #include "shape.h"
+#include <memory>
+#include "ptutility.h"
 #include <cmath>
 #include <limits>
 

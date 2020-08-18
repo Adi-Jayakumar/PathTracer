@@ -1,6 +1,7 @@
 #pragma once
 #include "image.h"
 #include "ray.h"
+#include <memory>
 
 struct Shape
 {

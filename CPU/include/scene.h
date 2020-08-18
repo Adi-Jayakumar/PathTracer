@@ -4,6 +4,7 @@
 #include "solid.h"
 #include "sphere.h"
 #include "triangle.h"
+#include "plane.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>

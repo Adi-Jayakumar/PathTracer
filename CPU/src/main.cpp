@@ -15,6 +15,7 @@
 int main(int argc, char **argv)
 {
 
+    
     Scene scene;
 
     scene.LoadCornell(10);
