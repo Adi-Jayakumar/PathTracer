@@ -1,12 +1,12 @@
-#include <cmath>
 #include "image.h"
+#include <cmath>
 
 Image::Image(int _dimX, int _dimY, int index)
 {
     dimX = _dimX;
     dimY = _dimY;
-    const char* str = "result";
-    const char* ext = ".ppm";
+    const char *str = "result";
+    const char *ext = ".ppm";
     char fileName[sizeof(str) + sizeof(ext) + 1];
     snprintf(fileName, sizeof(fileName), "%s %d%s", str, index, ext);
     file = fopen(fileName, "wb");
@@ -25,9 +25,9 @@ void Image::Set(Vec *colour)
     {
         Vec c = colour[i];
         unsigned char col[3];
-        double r = pow(c.x, 1.0 / 2) * 255;
-        double g = pow(c.y, 1.0 / 2) * 255;
-        double b = pow(c.z, 1.0 / 2) * 255;
+        float r = pow(c.x, 1.0 / 2) * 255;
+        float g = pow(c.y, 1.0 / 2) * 255;
+        float b = pow(c.z, 1.0 / 2) * 255;
         col[0] = r > 255 ? 255 : r < 0 ? 0 : r;
         col[1] = g > 255 ? 255 : g < 0 ? 0 : g;
         col[2] = b > 255 ? 255 : b < 0 ? 0 : b;

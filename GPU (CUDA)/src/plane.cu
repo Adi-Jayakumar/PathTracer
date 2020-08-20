@@ -6,11 +6,11 @@ __device__ Plane::Plane(Vec _n, Vec _p)
     n = _n;
 }
 
-__device__ bool Plane::Intersect(Ray &ray, double &hit)
+__device__ bool Plane::Intersect(Ray &ray, float &hit)
 {
     bool didHit = false;
-    double t = PTUtility::INF;
-    double det = Vec::Dot(ray.d, n);
+    float t = PTUtility::INF;
+    float det = Vec::Dot(ray.d, n);
 
     // plane and ray not parallel
     if (fabs(det) != 0)

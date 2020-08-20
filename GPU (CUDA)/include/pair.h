@@ -2,6 +2,6 @@
 
 struct Pair
 {
-    double first;
-    double second;
+    float first;
+    float second;
 };

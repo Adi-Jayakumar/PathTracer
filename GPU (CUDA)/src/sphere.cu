@@ -1,20 +1,20 @@
-#include "sphere.h"
 #include "pair.h"
+#include "sphere.h"
 #include <cmath>
 #include <limits>
 
-__device__ Sphere::Sphere(double _r, Vec _c)
+__device__ Sphere::Sphere(float _r, Vec _c)
 {
 
     r = _r;
     c = _c;
 }
 
-__device__ bool Sphere::Intersect(Ray &ray, double &hit)
+__device__ bool Sphere::Intersect(Ray &ray, float &hit)
 {
-    double A = Vec::Dot(ray.d, ray.d);
-    double B = 2 * Vec::Dot(ray.o, ray.d) - 2 * Vec::Dot(c, ray.d);
-    double C = Vec::Dot(ray.o, ray.o) + Vec::Dot(c, c) - 2 * Vec::Dot(ray.o, c) - r * r;
+    float A = Vec::Dot(ray.d, ray.d);
+    float B = 2 * Vec::Dot(ray.o, ray.d) - 2 * Vec::Dot(c, ray.d);
+    float C = Vec::Dot(ray.o, ray.o) + Vec::Dot(c, c) - 2 * Vec::Dot(ray.o, c) - r * r;
     bool didHit = false;
 
     Pair vals = PTUtility::SolveQuadratic(A, B, C);

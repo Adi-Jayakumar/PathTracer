@@ -14,12 +14,12 @@ __device__ Camera::Camera()
     nPixelsY = 0;
 }
 
-__device__ Camera::Camera(double _worldW, int _nPixelsX, int _nPixelsY, Vec _loc, Vec _forward, Vec _up, double _hFOV)
+__device__ Camera::Camera(float _worldW, int _nPixelsX, int _nPixelsY, Vec _loc, Vec _forward, Vec _up, float _hFOV)
 {
     worldW = _worldW;
     nPixelsX = _nPixelsX;
     nPixelsY = _nPixelsY;
-    worldH = worldW * (double)nPixelsY / nPixelsX;
+    worldH = worldW * (float)nPixelsY / nPixelsX;
     loc = _loc;
     forward = _forward.Norm();
     up = _up.Norm();
@@ -60,20 +60,20 @@ __device__ Ray Camera::GenerateAARay(int i, int j, int sx, int sy, curandState &
     we can see that with respect to c, o becomes (j - 0.5, 0.5 - i) in a world where the top of 
     the screen is up and the right is right
     */
-    double r1 = 2 * PTUtility::Random(state);
-    double dx = r1 < 1 ? sqrt(r1) - 1 : 1 - sqrt(2 - r1);
-    double r2 = 2 * PTUtility::Random(state);
-    double dy = r1 < 1 ? sqrt(r2) - 1 : 1 - sqrt(2 - r2);
-    Vec deltaRight = right * worldW * (((double)j + (sx + 0.5 + dx) / 2) / nPixelsX - 0.5);
-    Vec deltaUp = up * worldH * (0.5 - ((double)i + (sy + 0.5 + dy) / 2) / nPixelsY);
+    float r1 = 2 * PTUtility::Random(state);
+    float dx = r1 < 1 ? sqrt(r1) - 1 : 1 - sqrt(2 - r1);
+    float r2 = 2 * PTUtility::Random(state);
+    float dy = r1 < 1 ? sqrt(r2) - 1 : 1 - sqrt(2 - r2);
+    Vec deltaRight = right * worldW * (((float)j + (sx + 0.5 + dx) / 2) / nPixelsX - 0.5);
+    Vec deltaUp = up * worldH * (0.5 - ((float)i + (sy + 0.5 + dy) / 2) / nPixelsY);
     Vec rayOr = deltaUp + deltaRight + loc;
     return Ray(rayOr, (rayOr - focus).Norm());
 }
 
 __device__ Ray Camera::GenerateRay(int i, int j)
 {
-    Vec deltaRight = right * worldW * ((double)j / nPixelsX - 0.5);
-    Vec deltaUp = up * worldH * (0.5 - (double)i / nPixelsY);
+    Vec deltaRight = right * worldW * ((float)j / nPixelsX - 0.5);
+    Vec deltaUp = up * worldH * (0.5 - (float)i / nPixelsY);
     Vec rayOr = deltaUp + deltaRight + loc;
     return Ray(rayOr, (rayOr - focus).Norm());
 }

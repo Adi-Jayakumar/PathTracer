@@ -1,14 +1,15 @@
-#include <iostream>
 #include "hitrecord.h"
+#include <iostream>
 
-__device__ HitRecord::HitRecord(double _t, int _id)
-{   
+__device__ HitRecord::HitRecord(float _t, int _id)
+{
     t = _t;
     id = _id;
 }
 
 std::ostream &operator<<(std::ostream &out, HitRecord const &h)
 {
-    out << "Hit t = " << h.t << " " << "Hit id = " << h.id << std::endl;
+    out << "Hit t = " << h.t << " "
+        << "Hit id = " << h.id << std::endl;
     return out;
 }

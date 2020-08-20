@@ -2,11 +2,11 @@
 #include "cuda_device_runtime_api.h"
 #include "hitrecord.h"
 #include "image.h"
+#include "plane.h"
 #include "ptutility.h"
 #include "scene.h"
 #include "solid.h"
 #include "sphere.h"
-#include "plane.h"
 #include "vector.h"
 #include <curand_kernel.h>
 #include <iostream>
@@ -35,38 +35,36 @@ __global__ void CreateWorld(Solid **objects)
     //     *(objects + 2) = new Solid(new Sphere(20, Vec()), Vec(), Vec(1, 1, 1), Surface::DIFF);
     //     // *(objects + 1) = new Solid(new Sphere(2, Vec(2, 0, 3)), Vec(), Vec(1, 1, 1), Surface::DIFF);
     // }
-    
-    if(threadIdx.x == 0 && blockIdx.x == 0)
+
+    if (threadIdx.x == 0 && blockIdx.x == 0)
     {
-        Plane* front = new Plane(Vec(0, 0, -1), Vec(0, 0, 10));
-        Plane* right = new Plane(Vec(-1, 0, 0), Vec(10, 0, 0));
-        Plane* back = new Plane(Vec(0, 0, 1), Vec(0, 0, -10));
-        Plane* left = new Plane(Vec(1, 0, 0), Vec(-10, 0, 0));
-        Plane* top = new Plane(Vec(0, -1, 0), Vec(0, 10, 0));
-        Plane* bottom = new Plane(Vec(0, 1, 0), Vec(0., -10, 0));
-        
+        Plane *front = new Plane(Vec(0, 0, -1), Vec(0, 0, 10));
+        Plane *right = new Plane(Vec(-1, 0, 0), Vec(10, 0, 0));
+        Plane *back = new Plane(Vec(0, 0, 1), Vec(0, 0, -10));
+        Plane *left = new Plane(Vec(1, 0, 0), Vec(-10, 0, 0));
+        Plane *top = new Plane(Vec(0, -1, 0), Vec(0, 10, 0));
+        Plane *bottom = new Plane(Vec(0, 1, 0), Vec(0., -10, 0));
+
         *(objects) = new Solid(front, Vec(), Vec(1, 1, 1), Surface::DIFF);
         *(objects + 1) = new Solid(right, Vec(), Vec(0, 1, 0), Surface::DIFF);
         *(objects + 2) = new Solid(back, Vec(), Vec(), Surface::DIFF);
         *(objects + 3) = new Solid(left, Vec(), Vec(1, 0, 0), Surface::DIFF);
         *(objects + 4) = new Solid(top, Vec(1, 1, 1), Vec(), Surface::DIFF);
         *(objects + 5) = new Solid(bottom, Vec(), Vec(1, 1, 1), Surface::DIFF);
-        
-        *(objects + 6) = new Solid(new Sphere(5, Vec(-5, -5, 2)), Vec(), Vec(1,1,1), Surface::SPEC);
+
+        *(objects + 6) = new Solid(new Sphere(5, Vec(-5, -5, 2)), Vec(), Vec(1, 1, 1), Surface::SPECGLOSS);
         *(objects + 7) = new Solid(new Sphere(5, Vec(5, -5, -5)), Vec(), Vec(1, 1, 1), Surface::REFRGLOSS);
     }
-    
 }
 
-__device__ Vec Colour(Ray r, Solid ** objects, int nObj)
+__device__ Vec Colour(Ray r, Solid **objects, int nObj)
 {
-    
+
     HitRecord rec = Scene::ClosestIntersection(r, objects, nObj);
-    if(rec.id == -1)
+    if (rec.id == -1)
         return Vec();
     else
         return objects[rec.id]->c;
-    
 }
 
 __global__ void FreeWorld(Solid **objects, int nObj)
@@ -88,7 +86,7 @@ __global__ void Render(Vec *fb, Solid **objects, int nObj)
         int index = j * PTUtility::W + i;
         curandState state;
         curand_init(1234, index, 0, &state);
-        Camera cam = Camera(20, PTUtility::W, PTUtility::H, Vec(0,0,-10), Vec(0, 0, 1), Vec(0, 1, 0), 3.1415926535 / 3);
+        Camera cam = Camera(20, PTUtility::W, PTUtility::H, Vec(0, 0, -10), Vec(0, 0, 1), Vec(0, 1, 0), 3.1415926535 / 3);
         Ray r = Ray();
         Vec c = Vec();
         for (int sx = 0; sx < PTUtility::SubPixSize; sx++)
@@ -104,7 +102,7 @@ __global__ void Render(Vec *fb, Solid **objects, int nObj)
                 }
             }
         }
-        fb[index] = c / ((double)PTUtility::NumSamps * PTUtility::SubPixSize * PTUtility::SubPixSize);
+        fb[index] = c / ((float)PTUtility::NumSamps * PTUtility::SubPixSize * PTUtility::SubPixSize);
     }
 }
 
@@ -139,12 +137,12 @@ int main()
     checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
     stop = clock();
-    double timer_seconds = ((double)(stop - start)) / CLOCKS_PER_SEC;
+    float timer_seconds = ((float)(stop - start)) / CLOCKS_PER_SEC;
     std::cerr << "took " << timer_seconds << " seconds.\n";
 
     Image image = Image(PTUtility::W, PTUtility::H, 0);
     image.Set(fb);
     checkCudaErrors(cudaFree(fb));
-    FreeWorld<<<1,1>>>(objects, nObj);
+    FreeWorld<<<1, 1>>>(objects, nObj);
     return 0;
 }
