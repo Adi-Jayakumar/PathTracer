@@ -34,8 +34,3 @@ void Image::Set(Vec *colour)
         fwrite(col, 1, 3, file);
     }
 }
-
-void Image::Close()
-{
-    fclose(file);
-}

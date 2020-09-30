@@ -23,7 +23,7 @@ namespace PTUtility
 
     /* maps an rgb colour to a grayscale value betweeon 0 and 1
     to determine Russian Roulette probability for termination
-    based off an empirical formula */
+    - an empirical formula */
     __device__ float Luma(const Vec &colour);
 
     // non deterministic RNG between 0 and 1

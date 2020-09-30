@@ -3,7 +3,7 @@
 
 struct HitRecord
 {
-    float t; // value of the line parameter at the hitpoint --> inf if no hit
+    float t; // value of the line parameter at the hitpoint --> double's max value if no hit
     int id;  // index of the sphere that was hit --> -1 if not hit
     __device__ HitRecord(float _t, int _id);
     __device__ HitRecord()

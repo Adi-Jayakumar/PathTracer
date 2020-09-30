@@ -9,5 +9,4 @@ struct Image
     Image(int _dimX, int _dimY, int index);
     ~Image();
     void Set(Vec* colour); // prints the value of colour into the next entry inthe file
-    void Close(); // closes the file -- obsolete since that is now handled in the destructor
 };

@@ -13,10 +13,9 @@ __device__ HitRecord Scene::ClosestIntersection(Ray r, Solid **objects, int nObj
     for (long unsigned i = 0; i < nObj; i++)
     {
         t = PTUtility::INF;
-        objects[i]->shape->Intersect(r, t);
 
         // if hit then set the "record" values accordingly
-        if (t < recordT)
+        if (objects[i]->shape->Intersect(r, t))
         {
             recordT = t;
             idMin = i;
