@@ -7,11 +7,11 @@
 
 struct Plane : Shape
 {
+    // n.(x - p) = 0
     Vec n; // normal
-    Vec p;
+    Vec p; // location of plane
     Plane(Vec _n, Vec _p);
-    bool Intersect(Ray &ray, double &hit, std::shared_ptr<std::pair<double, double>> values = nullptr) override;
+    bool Intersect(Ray &ray, double &hit) override;
     Vec Normal(Vec &x) override;
     void Translate(Vec &x) override;
-    bool IsOnSkin(Vec &x) override;
 };

@@ -7,14 +7,14 @@ Plane::Plane(Vec _n, Vec _p)
     n = _n;
 }
 
-bool Plane::Intersect(Ray &ray, double &hit, std::shared_ptr<std::pair<double, double>> values)
+bool Plane::Intersect(Ray &ray, double &hit)
 {
     bool didHit = false;
     double t = std::numeric_limits<double>::max();
     double det = Vec::Dot(ray.d, n);
 
     // plane and ray not parallel
-    if (det != 0)
+    if (fabs(det) >= PTUtility::EPSILON)
     {
         t = Vec::Dot(n, p - ray.o) / det;
         if (t > PTUtility::EPSILON)
@@ -23,12 +23,7 @@ bool Plane::Intersect(Ray &ray, double &hit, std::shared_ptr<std::pair<double, d
             didHit = true;
         }
     }
-
-    if (values != nullptr)
-    {
-        values->first = t;
-        values->second = t;
-    }
+    
     return didHit;
 }
 
@@ -40,9 +35,4 @@ Vec Plane::Normal(Vec &x)
 void Plane::Translate(Vec &x)
 {
     p = p + x;
-}
-
-bool Plane::IsOnSkin(Vec &x)
-{
-    return fabs(Vec::Dot(n, x - p)) < PTUtility::EPSILON;
 }

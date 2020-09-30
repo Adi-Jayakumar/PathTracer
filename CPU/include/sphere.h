@@ -12,8 +12,7 @@ struct Sphere : Shape
     double r;
     Vec c;
     Sphere(double _r, Vec _c);
-    bool Intersect(Ray &ray, double &hit, std::shared_ptr<std::pair<double, double>> values =nullptr) override;
+    bool Intersect(Ray &ray, double &hit) override;
     Vec Normal(Vec &v) override;
     void Translate(Vec &x) override;
-    bool IsOnSkin(Vec &x) override;
 };

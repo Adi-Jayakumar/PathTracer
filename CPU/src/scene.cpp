@@ -21,10 +21,9 @@ HitRecord Scene::ClosestIntersection(Ray r)
     for (long unsigned i = 0; i < objects.size(); i++)
     {
         t = std::numeric_limits<double>::max();
-        objects[i].shape->Intersect(r, t);
 
         // if hit then set the "record" values accordingly
-        if (t < recordT)
+        if (objects[i].shape->Intersect(r, t))
         {
             recordT = t;
             idMin = i;
@@ -91,6 +90,7 @@ Vec Scene::RayColour(Ray r, int depth)
     }
     else if (hit.s == Surface::SPECGLOSS)
     {
+        // choose a random ray direction sampling in a cone around the true reflected direction
         Vec specReflDir = r.d - normal * 2 * Vec::Dot(normal, r.d);
         Vec w = specReflDir.Norm();
         Vec u = Vec(w.z, w.z, -w.x - 2 * w.y).Norm();
@@ -141,7 +141,7 @@ Vec Scene::RayColour(Ray r, int depth)
             return hit.e + albedo * RayColour(reflRay, depth);
 
         
-        // perfect refracted direction whcih we now need to jitter
+        // perfect refracted direction which we now need to jitter
         Vec specRefrDir = (r.d * netN - normal * ((isInto ? 1 : -1) * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
         w = specRefrDir.Norm();
         u = Vec(w.z, w.z, -w.x - 2 * w.y).Norm();
@@ -207,7 +207,7 @@ Vec Scene::RayColour(Ray r, int depth)
         Ray refractedRay = Ray(hitPt, refractedDir);
         // Vec refractedDir = (r.d * netN - rayNormal * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
 
-    // approximating reflection and refraction weights
+        // approximating reflection and refraction weights
         double a = n2 - n1;
         double b = n1 + n2;
         double R0 = (a * a) / (b * b);
@@ -278,7 +278,7 @@ void Scene::TakePicture(int index)
             std::cout << "Progress: " << (static_cast<double>(rowCount) / PTUtility::H) * 100 << "%" << std::endl;
     }
     im.Set(image);
-    delete[] image;
+    delete image;
 }
 
 void Scene::LoadCornell(double boxSize)
@@ -317,7 +317,6 @@ void Scene::LoadOBJModel(std::string fPath)
             double x, y, z;
             s >> junk >> x >> y >> z;
             Vec v = Vec(x, y, z);
-            // std::cout << v << std::endl;
             vertices.push_back(v);
         }
         else if (line[0] == 'f')

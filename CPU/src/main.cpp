@@ -12,10 +12,9 @@
 #include <iostream>
 
 // RUN: clear && make && ./bin/main
-int main(int argc, char **argv)
+int main()
 {
 
-    
     Scene scene;
 
     scene.LoadCornell(10);

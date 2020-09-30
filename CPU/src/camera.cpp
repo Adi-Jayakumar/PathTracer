@@ -12,17 +12,6 @@ Camera::Camera(double _worldW, int _nPixelsX, int _nPixelsY, Vec _loc, Vec _forw
     hFOV = _hFOV;
     right = Vec::Cross(up, forward).Norm();
     focus = _loc - forward * (worldW / (2 * tan(hFOV / 2)));
-
-    // std::cout << "worldW " << worldW << std::endl;
-    // std::cout << "worldH " << worldH << std::endl;
-    // std::cout << "nPixelsX " << nPixelsX << std::endl;
-    // std::cout << "nPixelsY " << nPixelsY << std::endl;
-    // std::cout << "forward " << forward << std::endl;
-    // std::cout << "up " << up << std::endl;
-    // std::cout << "hFOV " << hFOV << std::endl;
-    // std::cout << "right " << right << std::endl;
-    // std::cout << "d " << worldW / (2 * tan(hFOV / 2)) << std::endl;
-    // std::cout << "focus" << focus << std::endl;
 };
 
 Ray Camera::GenerateRay(int i, int j, int sx, int sy)

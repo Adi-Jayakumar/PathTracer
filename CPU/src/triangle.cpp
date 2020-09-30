@@ -8,7 +8,7 @@ Triangle::Triangle(Vec _p1, Vec _p2, Vec _p3)
     n = Vec::Cross(p3 - p1, p2 - p1).Norm();
 }
 
-bool Triangle::Intersect(Ray &r, double &hit, std::shared_ptr<std::pair<double, double>> values)
+bool Triangle::Intersect(Ray &r, double &hit)
 {
     hit = std::numeric_limits<double>::max();
     Vec edge1 = p2 - p1;
@@ -38,11 +38,6 @@ bool Triangle::Intersect(Ray &r, double &hit, std::shared_ptr<std::pair<double, 
             }
         }
     }
-    if (values != nullptr)
-    {
-        values->first = t;
-        values->second = t;
-    }
     return didHit;
 }
 
@@ -56,25 +51,4 @@ void Triangle::Translate(Vec &x)
     p1 = p1 + x;
     p2 = p2 + x;
     p3 = p3 + x;
-}
-
-bool Triangle::IsOnSkin(Vec &x)
-{
-    Vec AB = p2 - p1;
-    Vec BC = p3 - p2;
-    Vec CA = p1 - p3;
-
-    Vec AP = x - p1;
-    Vec BP = x - p2;
-    Vec CP = x - p3;
-
-    Vec u = Vec::Cross(AB, AP);
-    Vec v = Vec::Cross(BC, BP);
-    Vec w = Vec::Cross(CA, CP);
-
-    double d1 = Vec::Dot(n, u);
-    double d2 = Vec::Dot(n, v);
-    double d3 = Vec::Dot(n, w);
-
-    return (d1 > 0 && d2 > 0 && d3 > 0) || (d1 < 0 && d2 < 0 && d3 < 0);
 }
