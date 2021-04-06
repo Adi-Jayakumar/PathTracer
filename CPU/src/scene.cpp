@@ -140,7 +140,6 @@ Vec Scene::RayColour(Ray r, int depth)
         if (cosTheta2Sqr < 0)
             return hit.e + albedo * RayColour(reflRay, depth);
 
-        
         // perfect refracted direction which we now need to jitter
         Vec specRefrDir = (r.d * netN - normal * ((isInto ? 1 : -1) * (cosTheta * cosTheta + sqrt(cosTheta2Sqr)))).Norm();
         w = specRefrDir.Norm();
@@ -152,7 +151,7 @@ Vec Scene::RayColour(Ray r, int depth)
 
         xPrime = rad * cos(theta);
         yPrime = rad * sin(theta);
-        
+
         // jittered refracted direction
         Vec refrDir = (u * xPrime + v * yPrime + w).Norm();
         // jittered refracted ray
@@ -181,7 +180,6 @@ Vec Scene::RayColour(Ray r, int depth)
             else
                 return hit.e + albedo * RayColour(refrRay, depth) * refractionWeight;
         }
-
     }
     else if (hit.s == Surface::REFR)
     {
@@ -240,16 +238,16 @@ void Scene::TakePicture(int index)
     Vec *image = new Vec[PTUtility::W * PTUtility::H];
     Image im = Image(PTUtility::W, PTUtility::H, index);
     Ray r;
-    int rowCount;
+    int rowCount = 0;
 
     int numRays = PTUtility::W * PTUtility::H * PTUtility::NumSamps * PTUtility::SubPixSize * PTUtility::SubPixSize;
 
     std::cout << std::endl
-        << std::endl
-        << "Started casting rays" << std::endl
-        << "Number of rays cast: " << numRays << " (~10^" << floor(log10(numRays)) << ")" << std::endl
-        << std::endl;
-    #pragma omp parallel for schedule(dynamic, 1) private(r)
+              << std::endl
+              << "Started casting rays" << std::endl
+              << "Number of rays cast: " << numRays << " (~10^" << floor(log10(numRays)) << ")" << std::endl
+              << std::endl;
+    // #pragma omp parallel for schedule(dynamic, 1) private(r)
     // image rows
     for (int i = 0; i < PTUtility::H; i++)
     {
@@ -274,7 +272,7 @@ void Scene::TakePicture(int index)
             image[i * PTUtility::W + j] = c / ((double)PTUtility::NumSamps * PTUtility::SubPixSize * PTUtility::SubPixSize);
         }
         rowCount++;
-        if (rowCount % (PTUtility::H/10) == 0)
+        if (rowCount % (PTUtility::H / 10) == 0)
             std::cout << "Progress: " << (static_cast<double>(rowCount) / PTUtility::H) * 100 << "%" << std::endl;
     }
     im.Set(image);
@@ -297,7 +295,6 @@ void Scene::LoadCornell(double boxSize)
     objects.emplace_back(Solid(left, Vec(), Vec(1, 0, 0), Surface::DIFF));
     objects.emplace_back(Solid(top, Vec(1, 1, 1), Vec(), Surface::DIFF));
     objects.emplace_back(Solid(bottom, Vec(), Vec(1, 1, 1), Surface::DIFF));
-
 }
 
 void Scene::LoadOBJModel(std::string fPath)
