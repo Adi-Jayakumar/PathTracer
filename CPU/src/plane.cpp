@@ -27,7 +27,7 @@ bool Plane::Intersect(Ray &ray, double &hit)
     return didHit;
 }
 
-Vec Plane::Normal(Vec &x)
+Vec Plane::Normal(Vec &)
 {
     return n;
 }

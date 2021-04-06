@@ -41,7 +41,7 @@ bool Triangle::Intersect(Ray &r, double &hit)
     return didHit;
 }
 
-Vec Triangle::Normal(Vec &x)
+Vec Triangle::Normal(Vec &)
 {
     return n;
 }
