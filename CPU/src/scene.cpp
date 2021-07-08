@@ -23,7 +23,7 @@ HitRecord Scene::ClosestIntersection(Ray r)
         t = std::numeric_limits<double>::max();
 
         // if hit then set the "record" values accordingly
-        if (objects[i].shape->Intersect(r, t))
+        if (objects[i].shape->Intersect(r, t) && t < recordT)
         {
             recordT = t;
             idMin = i;
@@ -247,7 +247,7 @@ void Scene::TakePicture(int index)
               << "Started casting rays" << std::endl
               << "Number of rays cast: " << numRays << " (~10^" << floor(log10(numRays)) << ")" << std::endl
               << std::endl;
-    // #pragma omp parallel for schedule(dynamic, 1) private(r)
+#pragma omp parallel for schedule(dynamic, 1) private(r)
     // image rows
     for (int i = 0; i < PTUtility::H; i++)
     {

@@ -20,8 +20,8 @@ int main()
     scene.LoadCornell(10);
     std::shared_ptr<Sphere> mirror = std::make_shared<Sphere>(5, Vec(-5, -5, 2));
     std::shared_ptr<Sphere> glass = std::make_shared<Sphere>(5, Vec(5, -5, -5));
-    // scene.AddSolid(Solid(mirror, Vec(), Vec(1, 1, 1), Surface::SPEC));
-    // scene.AddSolid(Solid(glass, Vec(), Vec(1, 1, 1), Surface::REFRGLOSS));
+    scene.AddSolid(Solid(mirror, Vec(), Vec(1, 1, 1), Surface::SPEC));
+    scene.AddSolid(Solid(glass, Vec(), Vec(1, 1, 1), Surface::REFRGLOSS));
 
     // clock start
     auto start = std::chrono::high_resolution_clock::now();

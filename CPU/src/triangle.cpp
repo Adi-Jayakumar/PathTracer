@@ -29,7 +29,7 @@ bool Triangle::Intersect(Ray &r, double &hit)
             double v = Vec::Dot(r.d, q) / a;
             if (v >= 0 && u + v <= 1)
             {
-                double t = Vec::Dot(edge2, q) / a;
+                t = Vec::Dot(edge2, q) / a;
                 if (t > PTUtility::EPSILON)
                 {
                     hit = t;
